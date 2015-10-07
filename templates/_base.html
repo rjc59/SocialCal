@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>SocialCal</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script0001.js">
+    </script>
+  </head>
+  <body>
+    <a href="/">Main Page</a> |
+    {% if user_email %}
+	<a href="{{ continue }}">Continue to Website</a> | <a href="{{ logout_url }}">Sign Out</a>
+    {% else %}
+	<a href="{{ continue }}">Continue to Website</a> | <a href="{{ login_url }}">Sign In</a>
+    {% endif %}
+    <br><br>
+{% block bodycontent %}{% endblock %}
+
+  </body>
+</html>

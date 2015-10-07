@@ -1,0 +1,17 @@
+h1 {
+  font-family: Impact;
+  font-size: 24pt;
+  color: white;
+}
+
+backgroundPic{
+	width: 100%;
+	height
+	background: url("http://i.imgur.com/f6pIKPd.jpg");
+    background-size: 1042px 440px;
+    background-position: center center;
+    background-color: black;
+    background-repeat: no-repeat;
+    padding-top: 320px;
+}
+
