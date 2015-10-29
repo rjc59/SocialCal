@@ -95,7 +95,7 @@ class MainPageHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-    render_template(self, 'test.html', page_params)
+    render_template(self, 'frontPage.html', page_params)
 
 mappings = [
   ('/', MainPageHandler),
