@@ -1,20 +1,6 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 
-<!--
-<style>
-socal{
-    color: black;
-    font-style: Times;
-    font-size: 72px;
-    text-align: center;
-}
-body{
-    background-color: grey;
-}
-
-</style>
-!-->
 <style>
   .carousel-inner > .item > img,
   .carousel-inner > .item > a > img {
@@ -65,42 +51,5 @@ body{
 </body>
 <br>
 
-<div class = "container">
-	<label for: "inputTitle" class="control-label">Input your event data</label><br>
-	<form role = "form" method="post" action="/processform">
-		<div class="form-group">
-			<label for: "summary" class="control-label">Summary: </label><br>
-			<input type="text" name="summary">
-		</div>
-		<div class="form-group">
-			<label for: "location" class="control-label">Location: </label> <br>
-			<select class="input-medium" name="location">
-				<option>LA</option>
-				<option>NY</option>
-				<option>Pittsburgh</option>
-			</select>
-		</div>
-		<div class="form-group">
-			<label for: "startDate" class="control-label">Start Date: </label> <br>
-			<input type="text" name="startdate"><br>
-		</div>
-		<div class="form-group">
-			<label for: "endDate" class="control-label">End Date: </label> <br>
-			<input type="text" name="enddate"><br>
-		</div>
-		<div class="form-group">
-			<label for: "startTime" class="control-label">Start Time: </label> <br>
-			<input type="text" name="starttime"><br>
-		</div>
-		<div class="form-group">
-			<label for: "endTime" class="control-label">End Time: </label><br>
-			<input type="text" name="endtime"><br>
-		</div>
-		<div class="form-group">
-			<label for: "attendance" class="control-label">Maximum Attendance: </label><br>
-			<input type="text" name="attendees">
-		</div>
-		<button type="submit" class="btn btn-default">Submit</button><br>
-	</form>
-</div>
+
 {% endblock %}
