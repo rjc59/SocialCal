@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+
+
+<br><br><br>
+<br><br><br>
+
+<body>
+
+Title: {{event.title}} <br>
+Summary: {{event.summary}}<br>
+Start date: {{event.start_date}}<br>
+End date: {{event.end_date}}<br>
+Start time: {{event.start_time}}<br>
+End time: {{event.end_time}}<br>
+Information {{event.information}}<br>
+Max attendees: {{event.attendance}}<br>
+Location: {{event.location}}<br>
+Votes: {{event.votes}}<br>
+<br><br>
+{% for comment in comments %}
+{{comment.user}}: {{comment.text}}<br>
+{% endfor %}
+
+<form method="post" action="/CommentHandler">
+<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+<textarea name="comment"></textarea><br>
+<input type="submit" value="Submit Post">
+</form>
+
+<form method="post" action="/UpVote">
+	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+	<input type="submit" value="Upvote">
+</form>
+
+<form method="post" action="/DownVote">
+	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+	<input type="submit" value="DownVote">
+</form>
+
+{% if delete == 1 %}
+<form method="post" action="/DeleteEvent">
+	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+	<input type="submit" value="Delete this event">
+</form>
+{% endif %}
+
+</body>
+
+
+{% endblock %}

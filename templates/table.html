@@ -1,0 +1,57 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+
+<br><br><br>
+<br><br><br>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/jq-2.1.4,dt-1.10.9/datatables.min.css"/>
+ 
+<script type="text/javascript" src="https://cdn.datatables.net/r/bs/jq-2.1.4,dt-1.10.9/datatables.min.js"></script>
+
+<script>
+	$(document).ready(function() {
+    $('#example').DataTable();
+} );
+</script>
+
+<table id="example" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Summary</th>
+                <th>Start date</th>
+                <th>End date</th>
+                <th>Start time</th>
+                <th>End time</th>
+				<th>Location</th>
+            </tr>
+        </thead>
+		<tfoot>
+		    <tr>
+                <th>Title</th>
+                <th>Summary</th>
+                <th>Start date</th>
+                <th>End date</th>
+                <th>Start time</th>
+                <th>End time</th>
+				<th>Location</th>
+            </tr>
+		</tfoot>
+		
+		<tbody>
+
+{% for event_info in list %}
+		<tr>
+			<th><a href = "/event?id={{event_info.title}}{{event_info.start_date}}{{event_info.start_time}}">{{event_info.title}}</a></th>
+			<th>{{event_info.summary}}</th>
+			<th>{{event_info.start_date}}</th>
+			<th>{{event_info.end_date}}</th>
+			<th>{{event_info.start_time}}</th>
+			<th>{{event_info.end_time}}</th>
+			<th>{{event_info.location}}</th>
+		</tr>
+{% endfor %}
+
+		</tbody>
+		</table>
+{% endblock %}

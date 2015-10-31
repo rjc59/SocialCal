@@ -15,3 +15,8 @@ backgroundPic{
     padding-top: 320px;
 }
 
+#myCarousel {
+  height: 300;
+  width: 500;
+  overflow: hidden;
+}

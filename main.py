@@ -1,74 +1,152 @@
-import datetime
+#import datetime
 import logging
 import os
 import webapp2
-import json
+import time
+#import json
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
-from google.appengine.api import images
-from google.appengine.ext import blobstore
-from google.appengine.ext.webapp import blobstore_handlers
+#from google.appengine.api import images
+#from google.appengine.ext import blobstore
+#from google.appengine.ext.webapp import blobstore_handlers
 
+from google.appengine.api import mail
+import models
 
-class calendar:
+class VoteHandler(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
 
-	def __init__(self):
-		self.event = {
-		'summary': 'This is a summary',
-		'location': 'This is a location',
-		'description': 'This is a description',
-		'start': {
-			'dateTime': '2015-10-6T09:00:00-07:00',
-			'timeZone': 'America/Los_Angeles',
-			},
-		'end': {
-			'dateTime': '2015-10-6T17:00:00-07:00',
-			'timeZone': 'America/Los_Angeles',
-		},
-		'recurrence': [
-				'RRULE:FREQ=DAILY;COUNT=2'
-		],
-		'attendees': [
-		{'email': 'lpage@example.com'},
-		{'email': 'sbrin@example.com'},
-		],
-		'reminders': {
-				'useDefault': False,
-				'overrides': [
-		{'method': 'email', 'minutes': 24 * 60},
-		{'method': 'popup', 'minutes': 10},
-		],
-	  },
-	}
+		event = ndb.Key(models.event_info, id).get()
+		
+		#email = get_user_email()
+		#text = self.request.get("comment")
+		#event.create_comment(email,text)
+		self.redirect("/event?id=" + id)
 	
-	def get_event(self):
-		return self.event
+class CommentHandler(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
+		#logging.warning("AYYYYYYYY")
+		#logging.warning(id)
+		event = ndb.Key(models.event_info, id).get()
+		email = get_user_email()
+		if not email:
+			email = "Anonymous"
+			
+		text = self.request.get("comment")
+		event.create_comment(email,text)
+		self.redirect("/event?id=" + id)
+		
+		if event.user != "Anonymous":
+			mail.send_mail(sender="socialcaltk@socialcaltk.appspotmail.com", to=event.user, subject="Someone commented on your post!", body="Someone commented on your post! Click here to see it: gdh12-socal-test.appspot.com/event?id=" + id)
+		
+		
+class UpVoteHandler(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
+		event = ndb.Key(models.event_info, id).get()
+		event.votes = event.votes + 1
+		event.put()
+		self.redirect("/event?id=" + id)
+		
+class DownVoteHandler(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
+		event = ndb.Key(models.event_info, id).get()
+		if event.votes != 0:
+			event.votes = event.votes - 1
+			event.put()
+		self.redirect("/event?id=" + id)
 
+class DeleteEvent(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
+		event = ndb.Key(models.event_info, id).get()
+		event.delete_comments()
+		event.key.delete()
+		# time.sleep prevents it from showing on the front page due to redirect happening before the item is deleted
+		# Will look into a better solution
+		time.sleep(0.1) 
+		self.redirect('/')
+		
 class ProcessForm(webapp2.RequestHandler):
 	def post(self):
-		store = calendar()
-		event = store.get_event()
-		#logging.info(event)
-		event["summary"] = self.request.get("summary")
-		event["location"] =	self.request.get("location")
-		event["attendees"][0] = self.request.get("attendees")
-		startdate = self.request.get("startdate")
-		starttime = self.request.get("starttime")
-		enddate = self.request.get("enddate")
-		endtime = self.request.get("endtime")
-		event["start"]["dateTime"] = str(startdate) + " at " + str(starttime)
-		event["end"]["dateTime"] = str(enddate) + " at " + str(endtime)
-		render_template(self, "formresults.html", {
-		"dongs": json.dumps(event),
-		"summary": event["summary"],
-		"location": event["location"],
-		"attendees": event["attendees"][0],
-		"start": event["start"]["dateTime"],
-		"end": event["end"]["dateTime"],
-		})
+		email = get_user_email()
+		if not email:
+			email = "Anonymous"
+			
+		form_title = self.request.get("title")
+		form_summary = self.request.get("summary")
+		form_location = self.request.get("location")
+		form_information = self.request.get("information")
+		form_start_date = self.request.get("startdate")
+		form_end_date = self.request.get("enddate")
+		form_start_time = self.request.get("starttime")
+		form_end_time = self.request.get("endtime")
+		#logging.warning("HELLO WORLD")
+		#logging.warning(self.request.get("attendance"))
+		form_attendance = int(self.request.get("attendance"))
 		
+		event = models.event_info()
+		event.populate(title=form_title, 
+		summary=form_summary, 
+		information=form_information, 
+		start_date=form_start_date, 
+		end_date=form_end_date, 
+		start_time=form_start_time, 
+		end_time=form_end_time,
+		attendance=form_attendance,
+		location=form_location,
+		votes=0,
+		user=email)
+		
+		# This is probably a bad key. Need to figure out a better way to do this. These aspects of the event are uneditable now
+		key_data = event.title + event.start_date + event.start_time
+		#key_data = key_data.urlsafe()
+		event.key = ndb.Key(models.event_info, key_data)
+		event.put()
+		#logging.warning(key_data)
+		self.redirect("/event?id=" + key_data)
 
+
+class display_event(webapp2.RequestHandler):
+	def get(self):
+		id = self.request.get("id")
+		delete = 0
+		event = ndb.Key(models.event_info, id).get()
+		email = get_user_email()
+		comments = event.get_comments()
+		logging.warning("AYYYYYYY")
+		logging.warning(event.user)
+		logging.warning(email)
+		if event.user == email:
+			delete = 1
+			
+		page_params = {
+		  'user_email': email,
+		  'login_url': users.create_login_url(),
+		  'logout_url': users.create_logout_url('/'),
+		  "event": event,
+		  "comments": comments,
+		  "delete": delete
+		}
+		
+		render_template(self, 'event.html', page_params)
+	
+class event_list(webapp2.RequestHandler):
+	def get(self):
+		list = models.obtain_events()
+		email = get_user_email()
+		page_params = {
+      'user_email': email,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/'),
+	  "list": list
+    }
+	
+		render_template(self, 'table.html', page_params)
 
 	
 ###############################################################################
@@ -90,16 +168,36 @@ def get_user_email():
 class MainPageHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
+    list = models.sort_by_votes()
+    page_params = {
+      'user_email': email,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/'),
+	  "list": list
+    }
+    render_template(self, 'frontPage.html', page_params)
+
+class AddEventPageHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
     page_params = {
       'user_email': email,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-    render_template(self, 'test.html', page_params)
-
+	
+    render_template(self, 'addEventPage.html', page_params)	
+	
 mappings = [
   ('/', MainPageHandler),
   ('/processform', ProcessForm),
+  ('/event', display_event),
+  ('/list', event_list),
+  ('/addevent', AddEventPageHandler),
+  ('/CommentHandler', CommentHandler),
+  ('/UpVote', UpVoteHandler),
+  ('/DownVote', DownVoteHandler),
+  ('/DeleteEvent', DeleteEvent)
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)
 	
