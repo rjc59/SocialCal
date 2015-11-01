@@ -1,20 +1,22 @@
-h1 {
-  font-family: Impact;
-  font-size: 24pt;
-  color: white;
+he5 {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 20pt;
+  font-weight: bold;  
 }
 
-backgroundPic{
-	width: 100%;
-	height
-	background: url("http://i.imgur.com/f6pIKPd.jpg");
-    background-size: 1042px 440px;
-    background-position: center center;
-    background-color: black;
-    background-repeat: no-repeat;
-    padding-top: 320px;
+un{
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 16pt;
+  font-weight: bold;
 }
-
+nc{
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14pt;
+  font-weight: bold;
+}
+textarea{
+	resize: none;
+}
 #myCarousel {
   height: 300;
   width: 500;
