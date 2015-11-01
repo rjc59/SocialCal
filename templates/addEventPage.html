@@ -1,6 +1,8 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
+<script>
 
+</script>
 <br><br><br><br>
 <div class = "container">
 	<div class="panel panel-default col-xs-5">
@@ -13,7 +15,7 @@
 			<form role = "form" method="post" class="form-inline" action="/processform">
 				<div class="form-group">
 					<label for: "summary" class="control-label">Title: </label><br>
-					<input type="text" class="form-control" name="title" maxlength=25>
+					<input type="text" class="form-control" name="title" maxlength=25 required>
 				</div>
 				<div class="row">
 					<div class="form-group col-xs-3">
@@ -32,21 +34,21 @@
 				<div class="row">
 					<div class="form-group col-xs-3">
 						<label for: "startDate" class="control-label">Start Date: </label> <br>
-						<input class="form-control" type="date" name="startdate" placeholder="Start Date"><br>
+						<input class="form-control" type="date" name="startdate" placeholder="Start Date" required><br>
 					</div>
 					<div class="form-group col-xs-3 col-xs-offset-3">
 						<label for: "endDate" class="control-label">End Date: </label> <br>
-						<input class="form-control" type="date" name="enddate" placeholder="End Date"><br>
+						<input class="form-control" type="date" name="enddate" placeholder="End Date" required><br>
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col-xs-3">
 						<label for: "startTime" class="control-label">Start Time: </label> <br>
-						<input class="form-control" type="time" value="00:00" name="starttime" placeholder="Start Time"><br>
+						<input class="form-control" type="time" value="00:00" name="starttime" placeholder="Start Time" required><br>
 					</div>
 					<div class="form-group col-xs-3 col-xs-offset-3">
 						<label for: "endTime" class="control-label">End Time: </label><br>
-						<input class="form-control" type="time" value="00:00" name="endtime" placeholder="End Time"><br>
+						<input class="form-control" type="time" value="00:00" name="endtime" placeholder="End Time" required><br>
 					</div>
 				</div>
 				<div class="row">
