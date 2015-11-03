@@ -23,6 +23,8 @@ class event_info(ndb.Model):
 	
 	user = ndb.StringProperty()
 	
+	featured = ndb.BooleanProperty()
+
 	def create_comment(self, xuser, xtext):
 		comment = event_comment(parent=self.key)
 		comment.populate(user=xuser, text=xtext)
@@ -60,5 +62,12 @@ def sort_by_votes():
 	q = event_info.query()
 	q = q.order(-event_info.votes)
 	for i in q.fetch(5):
+		result.append(i)
+	return result
+
+def get_featured():
+	result = list()
+	q = event_info.query(event_info.featured == True)
+	for i in q.fetch(4):
 		result.append(i)
 	return result

@@ -169,11 +169,13 @@ class MainPageHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     list = models.sort_by_votes()
+    featured = models.get_featured()
     page_params = {
       'user_email': email,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
-	  "list": list
+	  "list": list,
+	  "featured": featured
     }
     render_template(self, 'frontPage.html', page_params)
 
