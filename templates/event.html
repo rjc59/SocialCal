@@ -2,7 +2,7 @@
 {% block bodycontent %}
 
 
-<br><br><br><br>
+<br><br><br>
 
 <body>
 <div class="container">
@@ -16,7 +16,7 @@
 	Max attendees: {{event.attendance}}<br>
 	Location: {{event.location}}<br>
 	Votes: {{event.votes}}<br>
-	<br><br>
+	<br>
 	<div class="container">
 		<div class="row">
 			<form method="post" action="/UpVote">
@@ -38,35 +38,36 @@
 		</div>
 	</div>
 	<br>
-	<div class = "container">
-		<div class="panel panel-default" id="accordian">
-			<div class = "panel-heading">
-				<div class="panel-title text-center">
-					<a href="#collapse" style="text-decoration:none" data-toggle="collapse" data-parent="accordian">
-					<he5>Comments (click to hide)</he5>
-					</a>
-				</div>
+</div>
+<div class = "container">
+	<div class="panel panel-default" id="accordian">
+		<div class = "panel-heading">
+			<div class="panel-title text-center">
+				<a href="#collapse" style="text-decoration:none" data-toggle="collapse" data-parent="accordian">
+				<he5>Comments (click to hide)</he5>
+				</a>
 			</div>
-			<div id="collapse" class="panel-collapse collapse in">
-				<div class="panel-body">
-					{% for comment in comments %}
-					<un>{{comment.user}}:</un><br>
-					{{comment.text}}<br>
-					{% endfor %}
-				</div>
+		</div>
+		<div id="collapse" class="panel-collapse collapse in">
+			<div class="panel-body">
+				{% for comment in comments %}
+				<un>{{comment.user}}:</un><br>
+				<nc>{{comment.text}}</nc><br>
+				{% endfor %}
 			</div>
 		</div>
 	</div>
-	<div class ="container">
-	<nc>Add New Comment</nc>
-		<form method="post" action="/CommentHandler">
-		<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
-		<textarea name="comment"></textarea><br>
-		<input type="submit" value="Submit Post">
-		</form>
-	</div>
-	
 </div>
+<div class ="container">
+<nc>Add New Comment:</nc>
+	<form method="post" action="/CommentHandler">
+	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+	<textarea class="form-control input-md" rows="5" style="font-size:14pt" name="comment" maxlength=140></textarea><br>
+	<input type="submit" value="Submit Post">
+	</form>
+</div>
+	
+
 </body>
 
 
