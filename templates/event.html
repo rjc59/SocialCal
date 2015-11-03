@@ -6,16 +6,18 @@
 
 <body>
 <div class="container">
-	Title: {{event.title}} <br>
-	Summary: {{event.summary}}<br>
-	Start date: {{event.start_date}}<br>
-	End date: {{event.end_date}}<br>
-	Start time: {{event.start_time}}<br>
-	End time: {{event.end_time}}<br>
-	Information {{event.information}}<br>
+	<et>{{event.title}}:</et> <br>
+	<es>{{event.summary}}</es><br>
+	<ei>{{event.start_date}} @ {{event.start_time}}<br>
+	til<br>
+	{{event.end_date}} @ {{event.end_time}}<br>
 	Max attendees: {{event.attendance}}<br>
 	Location: {{event.location}}<br>
-	Votes: {{event.votes}}<br>
+	Current Rating: {% if event.votes > 0 %} +{{event.votes}}
+			{% else %} 0
+			{% endif %}<br>
+	Additional Information: 
+	<br>{{event.information}}</ei>
 	<br>
 	<form method="post" action="/UpVote">
 		<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
