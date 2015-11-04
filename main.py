@@ -19,12 +19,12 @@ class VoteHandler(webapp2.RequestHandler):
 		id = self.request.get("id")
 
 		event = ndb.Key(models.event_info, id).get()
-		
+
 		#email = get_user_email()
 		#text = self.request.get("comment")
 		#event.create_comment(email,text)
 		self.redirect("/event?id=" + id)
-	
+
 class CommentHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
@@ -34,15 +34,15 @@ class CommentHandler(webapp2.RequestHandler):
 		email = get_user_email()
 		if not email:
 			email = "Anonymous"
-			
+
 		text = self.request.get("comment")
 		event.create_comment(email,text)
 		self.redirect("/event?id=" + id)
-		
+
 		if event.user != "Anonymous":
-			mail.send_mail(sender="socialcaltk@socialcaltk.appspotmail.com", to=event.user, subject="Someone commented on your post!", body="Someone commented on your post! Click here to see it: gdh12-socal-test.appspot.com/event?id=" + id)
-		
-		
+			mail.send_mail(sender="socialeventcal@socialeventcal.appspotmail.com", to=event.user, subject="Someone commented on your post!", body="Someone commented on your post! Click here to see it: gdh12-socal-test.appspot.com/event?id=" + id)
+
+
 class UpVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
@@ -50,7 +50,7 @@ class UpVoteHandler(webapp2.RequestHandler):
 		event.votes = event.votes + 1
 		event.put()
 		self.redirect("/event?id=" + id)
-		
+
 class DownVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
@@ -68,15 +68,15 @@ class DeleteEvent(webapp2.RequestHandler):
 		event.key.delete()
 		# time.sleep prevents it from showing on the front page due to redirect happening before the item is deleted
 		# Will look into a better solution
-		time.sleep(0.1) 
+		time.sleep(0.1)
 		self.redirect('/')
-		
+
 class ProcessForm(webapp2.RequestHandler):
 	def post(self):
 		email = get_user_email()
 		if not email:
 			email = "Anonymous"
-			
+
 		form_title = self.request.get("title")
 		form_summary = self.request.get("summary")
 		form_location = self.request.get("location")
@@ -88,20 +88,20 @@ class ProcessForm(webapp2.RequestHandler):
 		#logging.warning("HELLO WORLD")
 		#logging.warning(self.request.get("attendance"))
 		form_attendance = int(self.request.get("attendance"))
-		
+
 		event = models.event_info()
-		event.populate(title=form_title, 
-		summary=form_summary, 
-		information=form_information, 
-		start_date=form_start_date, 
-		end_date=form_end_date, 
-		start_time=form_start_time, 
+		event.populate(title=form_title,
+		summary=form_summary,
+		information=form_information,
+		start_date=form_start_date,
+		end_date=form_end_date,
+		start_time=form_start_time,
 		end_time=form_end_time,
 		attendance=form_attendance,
 		location=form_location,
 		votes=0,
 		user=email)
-		
+
 		# This is probably a bad key. Need to figure out a better way to do this. These aspects of the event are uneditable now
 		key_data = event.title + event.start_date + event.start_time
 		#key_data = key_data.urlsafe()
@@ -123,7 +123,7 @@ class display_event(webapp2.RequestHandler):
 		logging.warning(email)
 		if event.user == email:
 			delete = 1
-			
+
 		page_params = {
 		  'user_email': email,
 		  'login_url': users.create_login_url(),
@@ -132,9 +132,9 @@ class display_event(webapp2.RequestHandler):
 		  "comments": comments,
 		  "delete": delete
 		}
-		
+
 		render_template(self, 'event.html', page_params)
-	
+
 class event_list(webapp2.RequestHandler):
 	def get(self):
 		list = models.obtain_events()
@@ -145,10 +145,10 @@ class event_list(webapp2.RequestHandler):
       'logout_url': users.create_logout_url('/'),
 	  "list": list
     }
-	
+
 		render_template(self, 'table.html', page_params)
 
-	
+
 ###############################################################################
 # We'll just use this convenience function to retrieve and render a template.
 def render_template(handler, templatename, templatevalues={}):
@@ -164,7 +164,7 @@ def get_user_email():
   if user:
     result = user.email()
   return result
-  
+
 class MainPageHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -187,9 +187,17 @@ class AddEventPageHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-	
-    render_template(self, 'addEventPage.html', page_params)	
-	
+
+    render_template(self, 'addEventPage.html', page_params)
+
+
+class calendar(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    page_params = {
+    }
+    render_template(self, 'calendar.html', page_params)
+
 mappings = [
   ('/', MainPageHandler),
   ('/processform', ProcessForm),
@@ -199,7 +207,7 @@ mappings = [
   ('/CommentHandler', CommentHandler),
   ('/UpVote', UpVoteHandler),
   ('/DownVote', DownVoteHandler),
-  ('/DeleteEvent', DeleteEvent)
+  ('/DeleteEvent', DeleteEvent),
+  ('/calendar', calendar)
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)
-	
