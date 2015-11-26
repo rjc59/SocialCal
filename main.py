@@ -110,7 +110,58 @@ class ProcessForm(webapp2.RequestHandler):
 		#logging.warning(key_data)
 		self.redirect("/event?id=" + key_data)
 
-
+class EditHandler(webapp2.RequestHandler):
+	def get(self):
+		id = self.request.get("id")
+		logging.warning("Hello")
+		event = ndb.Key(models.event_info, id).get()
+		email = get_user_email()
+		page_params = {
+		"user_email": email,
+		'login_url': users.create_login_url(),
+		'logout_url': users.create_logout_url('/'),
+		'event': event,
+		}
+		render_template(self, 'editEventPage.html', page_params)
+		
+	def post(self):
+		logging.warning("Hello2")
+		id = self.request.get("id")
+		
+		form_title = self.request.get("title")
+		form_summary = self.request.get("summary")
+		form_location = self.request.get("location")
+		form_information = self.request.get("information")
+		form_start_date = self.request.get("startdate")
+		form_end_date = self.request.get("enddate")
+		form_start_time = self.request.get("starttime")
+		form_end_time = self.request.get("endtime")
+		form_attendance = int(self.request.get("attendance"))
+		
+		event = ndb.Key(models.event_info, id).get()
+		
+		event.populate(title=form_title,
+		summary=form_summary,
+		information=form_information,
+		start_date=form_start_date,
+		end_date=form_end_date,
+		start_time=form_start_time,
+		end_time=form_end_time,
+		attendance=form_attendance,
+		location=form_location,)
+		
+		
+		logging.warning(event.title)
+		key_data = event.title + event.start_date + event.start_time
+		event.key = ndb.Key(models.event_info, key_data)
+		event.put()
+		event = ndb.Key(models.event_info, id).get()
+		event.delete_comments()
+		event.key.delete()
+		logging.warning("Hello2")
+		
+		self.redirect('/event?id=' + key_data)
+		
 class display_event(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
@@ -118,9 +169,9 @@ class display_event(webapp2.RequestHandler):
 		event = ndb.Key(models.event_info, id).get()
 		email = get_user_email()
 		comments = event.get_comments()
-		logging.warning("AYYYYYYY")
-		logging.warning(event.user)
-		logging.warning(email)
+		#logging.warning("AYYYYYYY")
+		#logging.warning(event.user)
+		#logging.warning(email)
 		if event.user == email:
 			delete = 1
 
@@ -189,8 +240,7 @@ class AddEventPageHandler(webapp2.RequestHandler):
     }
 
     render_template(self, 'addEventPage.html', page_params)
-
-
+	
 class calendar(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -208,6 +258,7 @@ mappings = [
   ('/UpVote', UpVoteHandler),
   ('/DownVote', DownVoteHandler),
   ('/DeleteEvent', DeleteEvent),
-  ('/calendar', calendar)
+  ('/calendar', calendar),
+  ('/edit', EditHandler),
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)

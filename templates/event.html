@@ -6,7 +6,7 @@
 
 <body>
 <div class="container">
-	<et>{{event.title}}:</et> <br>
+	<et>{{event.title}} :</et> <br>
 	<es>{{event.summary}}</es><br>
 	<ei>{{event.start_date}} @ {{event.start_time}}<br>
 	til<br>
@@ -33,6 +33,10 @@
 	<form method="post" action="/DeleteEvent">
 		<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
 		<input type="submit" value="Delete this event">
+	</form>
+	<form method="get" action="/edit">
+	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+		<input type="submit" value="Edit this event">
 	</form>
 	{% endif %}
 	<br>
