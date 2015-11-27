@@ -20,22 +20,22 @@
 	<br>{{event.information}}</ei>
 	<br>
 	<form method="post" action="/UpVote">
-		<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+		<input type="hidden" name="id" value="{{event.event_number}}">
 		<input type="submit" value="Upvote">
 	</form>
 
 	<form method="post" action="/DownVote">
-		<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+		<input type="hidden" name="id" value="{{event.event_number}}">
 		<input type="submit" value="DownVote">
 	</form>
 
 	{% if delete == 1 %}
 	<form method="post" action="/DeleteEvent">
-		<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+		<input type="hidden" name="id" value="{{event.event_number}}">
 		<input type="submit" value="Delete this event">
 	</form>
 	<form method="get" action="/edit">
-	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+	<input type="hidden" name="id" value="{{event.event_number}}">
 		<input type="submit" value="Edit this event">
 	</form>
 	{% endif %}
@@ -63,7 +63,7 @@
 <div class ="container">
 <nc>Add New Comment:</nc>
 	<form method="post" action="/CommentHandler">
-	<input type="hidden" name="id" value="{{event.title}}{{event.start_date}}{{event.start_time}}">
+	<input type="hidden" name="id" value="{{event.event_number}}">
 	<textarea class="form-control input-md" rows="5" style="font-size:14pt" name="comment" maxlength=140></textarea><br>
 	<input type="submit" value="Submit Post">
 	</form>

@@ -18,7 +18,7 @@ class VoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
 
-		event = ndb.Key(models.event_info, id).get()
+		event = ndb.Key(models.event_info, int(id)).get()
 
 		#email = get_user_email()
 		#text = self.request.get("comment")
@@ -30,7 +30,7 @@ class CommentHandler(webapp2.RequestHandler):
 		id = self.request.get("id")
 		#logging.warning("AYYYYYYYY")
 		#logging.warning(id)
-		event = ndb.Key(models.event_info, id).get()
+		event = ndb.Key(models.event_info, int(id)).get()
 		email = get_user_email()
 		if not email:
 			email = "Anonymous"
@@ -46,7 +46,8 @@ class CommentHandler(webapp2.RequestHandler):
 class UpVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		event = ndb.Key(models.event_info, id).get()
+		logging.warning(id)
+		event = ndb.Key(models.event_info, int(id)).get()
 		event.votes = event.votes + 1
 		event.put()
 		self.redirect("/event?id=" + id)
@@ -54,7 +55,8 @@ class UpVoteHandler(webapp2.RequestHandler):
 class DownVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		event = ndb.Key(models.event_info, id).get()
+		logging.warning(id)
+		event = ndb.Key(models.event_info, int(id)).get()
 		if event.votes != 0:
 			event.votes = event.votes - 1
 			event.put()
@@ -63,7 +65,7 @@ class DownVoteHandler(webapp2.RequestHandler):
 class DeleteEvent(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		event = ndb.Key(models.event_info, id).get()
+		event = ndb.Key(models.event_info, int(id)).get()
 		event.delete_comments()
 		event.key.delete()
 		# time.sleep prevents it from showing on the front page due to redirect happening before the item is deleted
@@ -88,7 +90,8 @@ class ProcessForm(webapp2.RequestHandler):
 		#logging.warning("HELLO WORLD")
 		#logging.warning(self.request.get("attendance"))
 		form_attendance = int(self.request.get("attendance"))
-
+		event_number = get_global_id()
+		
 		event = models.event_info()
 		event.populate(title=form_title,
 		summary=form_summary,
@@ -100,21 +103,21 @@ class ProcessForm(webapp2.RequestHandler):
 		attendance=form_attendance,
 		location=form_location,
 		votes=0,
-		user=email)
+		user=email,
+		event_number = event_number,)
 
 		# This is probably a bad key. Need to figure out a better way to do this. These aspects of the event are uneditable now
-		key_data = event.title + event.start_date + event.start_time
+		key_data = event_number
 		#key_data = key_data.urlsafe()
 		event.key = ndb.Key(models.event_info, key_data)
 		event.put()
-		#logging.warning(key_data)
-		self.redirect("/event?id=" + key_data)
+		self.redirect("/event?id=" + str(key_data))
 
 class EditHandler(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
 		logging.warning("Hello")
-		event = ndb.Key(models.event_info, id).get()
+		event = ndb.Key(models.event_info, int(id)).get()
 		email = get_user_email()
 		page_params = {
 		"user_email": email,
@@ -137,8 +140,8 @@ class EditHandler(webapp2.RequestHandler):
 		form_start_time = self.request.get("starttime")
 		form_end_time = self.request.get("endtime")
 		form_attendance = int(self.request.get("attendance"))
-		
-		event = ndb.Key(models.event_info, id).get()
+
+		event = ndb.Key(models.event_info, int(id)).get()
 		
 		event.populate(title=form_title,
 		summary=form_summary,
@@ -148,25 +151,23 @@ class EditHandler(webapp2.RequestHandler):
 		start_time=form_start_time,
 		end_time=form_end_time,
 		attendance=form_attendance,
-		location=form_location,)
+		location=form_location)
 		
 		
-		logging.warning(event.title)
-		key_data = event.title + event.start_date + event.start_time
-		event.key = ndb.Key(models.event_info, key_data)
+		
+		event.key = ndb.Key(models.event_info, int(id))
 		event.put()
-		event = ndb.Key(models.event_info, id).get()
-		event.delete_comments()
-		event.key.delete()
-		logging.warning("Hello2")
 		
-		self.redirect('/event?id=' + key_data)
+		
+		self.redirect('/event?id=' + id)
 		
 class display_event(webapp2.RequestHandler):
+	
 	def get(self):
 		id = self.request.get("id")
 		delete = 0
-		event = ndb.Key(models.event_info, id).get()
+		event = ndb.Key(models.event_info, int(id)).get()
+		logging.warning(event)
 		email = get_user_email()
 		comments = event.get_comments()
 		#logging.warning("AYYYYYYY")
@@ -199,7 +200,15 @@ class event_list(webapp2.RequestHandler):
 
 		render_template(self, 'table.html', page_params)
 
-
+##
+# This gets and increases the global id value. Don't go calling it unless you are adding something
+def get_global_id():
+	id = ndb.Key(models.global_id, "number").get()
+	value = id.next_id
+	id.increase_id()
+	id.put()
+	return value
+	
 ###############################################################################
 # We'll just use this convenience function to retrieve and render a template.
 def render_template(handler, templatename, templatevalues={}):
@@ -248,6 +257,29 @@ class calendar(webapp2.RequestHandler):
     }
     render_template(self, 'calendar.html', page_params)
 
+	
+class test(webapp2.RequestHandler):
+	def get(self):
+		logging.warning("WORLD")
+		email = get_user_email()
+		logging.warning("hello")
+		id = models.global_id()
+		id.next_id = 1
+		id.key = ndb.Key(models.global_id, "number")
+		id.put()
+		id = ndb.Key(models.global_id, "number").get()
+		id.increase_id()
+		
+		id = ndb.Key(models.global_id, "number").get()
+		logging.warning(id.next_id)
+		
+		page_params = {
+		'user_email': email,
+		'login_url': users.create_login_url(),
+		'logout_url': users.create_logout_url('/'), 
+		}
+		render_template(self, 'blanktest.html', page_params)
+		
 mappings = [
   ('/', MainPageHandler),
   ('/processform', ProcessForm),
@@ -260,5 +292,6 @@ mappings = [
   ('/DeleteEvent', DeleteEvent),
   ('/calendar', calendar),
   ('/edit', EditHandler),
+  ('/test', test),
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)

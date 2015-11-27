@@ -7,7 +7,12 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-
+class global_id(ndb.Model):
+	next_id = ndb.IntegerProperty()
+	
+	def increase_id(self):
+		self.next_id = self.next_id + 1
+		
 class event_info(ndb.Model):
 	title = ndb.StringProperty()
 	summary = ndb.StringProperty()
@@ -20,7 +25,7 @@ class event_info(ndb.Model):
 	attendance = ndb.IntegerProperty() ## assuming this is a number for now
 	time_created = ndb.DateTimeProperty(auto_now_add=True)
 	votes = ndb.IntegerProperty()
-	
+	event_number = ndb.IntegerProperty()
 	user = ndb.StringProperty()
 	
 	featured = ndb.BooleanProperty()
@@ -32,6 +37,7 @@ class event_info(ndb.Model):
 		return comment
 		
 	def get_comments(self):
+		#logging.warning("test")
 		result = list()
 		q = event_comment.query(ancestor=self.key)
 		q = q.order(-event_comment.time_created)

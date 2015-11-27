@@ -84,7 +84,7 @@
 		<div class="col-md-4 text-left">
 			<h3>Most Popular Events</h3>
 			{% for event in list %}
-			<h4> <a href = "/event?id={{event.title}}{{event.start_date}}{{event.start_time}}" style="text-decoration:none">{{event.title}}</a>
+			<h4> <a href = "/event?id={{event.event_number}}" style="text-decoration:none">{{event.title}}</a>
 			{% if event.votes > 0 %} +{{event.votes}}
 			{% else %} 0
 			{% endif %}
