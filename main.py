@@ -267,11 +267,6 @@ class test(webapp2.RequestHandler):
 		id.next_id = 1
 		id.key = ndb.Key(models.global_id, "number")
 		id.put()
-		id = ndb.Key(models.global_id, "number").get()
-		id.increase_id()
-		
-		id = ndb.Key(models.global_id, "number").get()
-		logging.warning(id.next_id)
 		
 		page_params = {
 		'user_email': email,
