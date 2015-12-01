@@ -247,8 +247,17 @@ class AddEventPageHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-
     render_template(self, 'addEventPage.html', page_params)
+
+class ProfilePageHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    page_params = {
+      'user_email': email,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
+    }
+    render_template(self, 'profile.html', page_params)	
 	
 class calendar(webapp2.RequestHandler):
   def get(self):
@@ -285,6 +294,7 @@ mappings = [
   ('/UpVote', UpVoteHandler),
   ('/DownVote', DownVoteHandler),
   ('/DeleteEvent', DeleteEvent),
+  ('/profile', ProfilePageHandler),
   ('/calendar', calendar),
   ('/edit', EditHandler),
   ('/test', test),

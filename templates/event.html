@@ -19,24 +19,25 @@
 	<b>Additional Information:</b> 
 	<br>{{event.information}}</ei>
 	<br>
+	{% if user_email %} <!--dont want not signed in users to be able to vote-->
 	<form method="post" action="/UpVote">
 		<input type="hidden" name="id" value="{{event.event_number}}">
-		<input type="submit" value="Upvote">
+		<input type="submit" class="btn btn-default" value="Upvote">
 	</form>
 
 	<form method="post" action="/DownVote">
 		<input type="hidden" name="id" value="{{event.event_number}}">
-		<input type="submit" value="DownVote">
+		<input type="submit" class="btn btn-default" value="DownVote">
 	</form>
-
+	{% endif %}
 	{% if delete == 1 %}
 	<form method="post" action="/DeleteEvent">
 		<input type="hidden" name="id" value="{{event.event_number}}">
-		<input type="submit" value="Delete this event">
+		<input type="submit" class="btn btn-default" value="Delete this event">
 	</form>
 	<form method="get" action="/edit">
 	<input type="hidden" name="id" value="{{event.event_number}}">
-		<input type="submit" value="Edit this event">
+		<input type="submit" class="btn btn-default" value="Edit this event">
 	</form>
 	{% endif %}
 	<br>
@@ -65,7 +66,7 @@
 	<form method="post" action="/CommentHandler">
 	<input type="hidden" name="id" value="{{event.event_number}}">
 	<textarea class="form-control input-md" rows="5" style="font-size:14pt" name="comment" maxlength=140></textarea><br>
-	<input type="submit" value="Submit Post">
+	<input type="submit" class="btn btn-default" value="Submit Post">
 	</form>
 </div>
 	

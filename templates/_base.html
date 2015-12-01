@@ -21,13 +21,15 @@
 					<li class = "dropdown">
 						<a href = "/" class = "dropdown-toggle" data-toggle = "dropdown">Events <b class = "caret"></b></a>
 						<ul class = "dropdown-menu">
+							{% if user_email %}
 							<li><a href="/addevent">Add Event</a></li>
+							{% endif %}
 							<li><a href="/list">View Events</a></li>
 						</ul>
 					</li>
 					<li>
 						{% if user_email %}
-						<a href="/calendar">Profile</a>
+						<a href="/profile">Profile</a>
 						{% else %}
 						{% endif %}
 					</li>
