@@ -225,20 +225,51 @@ def get_user_email():
     result = user.email()
   return result
 
+def get_user_id():
+	result = None
+	user = users.get_current_user()
+	if user:
+		result = user.user_id()
+	return result
+	
 class MainPageHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     list = models.sort_by_votes()
     featured = models.get_featured()
+    user_id = get_user_id()
     page_params = {
       'user_email': email,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
 	  "list": list,
-	  "featured": featured
+	  "featured": featured,
+	  'user_id': user_id,
     }
     render_template(self, 'frontPage.html', page_params)
 
+class ProfileHandler(webapp2.RequestHandler):
+	def get(self):
+		id = self.request.get("id")
+		q = models.get_user_profile(id)
+		if q == []:
+			create_profile(id)
+		profile = ndb.Key(models.user_profile, id).get()
+		page_params = {
+			'user_email': get_user_email(),
+			'login_url': users.create_login_url(),
+			'logout_url': users.create_logout_url('/'),
+			'user_id': id,
+		}
+		render_template(self, 'profile.html', page_params)
+
+def create_profile(id):
+	profile = models.user_profile()
+	profile.user_id = id
+	profile.key = ndb.Key(models.user_profile,id)
+	profile.put()
+	logging.warning("profile created!")
+	
 class AddEventPageHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -272,6 +303,7 @@ class test(webapp2.RequestHandler):
 		'user_email': email,
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'), 
+		'profile_id': users.user_id(),
 		}
 		render_template(self, 'blanktest.html', page_params)
 		
@@ -287,6 +319,7 @@ mappings = [
   ('/DeleteEvent', DeleteEvent),
   ('/calendar', calendar),
   ('/edit', EditHandler),
+  ('/profile', ProfileHandler),
   ('/test', test),
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)
