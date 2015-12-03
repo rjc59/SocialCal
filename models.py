@@ -11,8 +11,13 @@ class global_id(ndb.Model):
 	next_id = ndb.IntegerProperty()
 	
 	def increase_id(self):
+		logging.warning(self.next_id)
 		self.next_id = self.next_id + 1
-		
+
+class user_profile(ndb.Model):
+	user_id = ndb.StringProperty()
+	
+	
 class event_info(ndb.Model):
 	title = ndb.StringProperty()
 	summary = ndb.StringProperty()
@@ -77,3 +82,14 @@ def get_featured():
 	for i in q.fetch(4):
 		result.append(i)
 	return result
+	
+def get_user_profile(id):
+	logging.warning("start!")
+	result = list()
+	q = event_info.query(user_profile.user_id == id)
+	q = q.fetch(1)
+	logging.warning("This is q")
+	logging.warning(q)
+	if q == []:
+		logging.warning("empty!")
+	return q

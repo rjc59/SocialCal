@@ -124,6 +124,7 @@ class EditHandler(webapp2.RequestHandler):
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'),
 		'event': event,
+		'user_id': get_user_id(),
 		}
 		render_template(self, 'editEventPage.html', page_params)
 		
@@ -182,7 +183,8 @@ class display_event(webapp2.RequestHandler):
 		  'logout_url': users.create_logout_url('/'),
 		  "event": event,
 		  "comments": comments,
-		  "delete": delete
+		  "delete": delete,
+		  'user_id': get_user_id(),
 		}
 
 		render_template(self, 'event.html', page_params)
@@ -195,7 +197,8 @@ class event_list(webapp2.RequestHandler):
       'user_email': email,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
-	  "list": list
+	  "list": list,
+	  'user_id': get_user_id(),
     }
 
 		render_template(self, 'table.html', page_params)
@@ -203,8 +206,11 @@ class event_list(webapp2.RequestHandler):
 ##
 # This gets and increases the global id value. Don't go calling it unless you are adding something
 def get_global_id():
+	
 	id = ndb.Key(models.global_id, "number").get()
+	logging.warning(id)
 	value = id.next_id
+	logging.warning(value)
 	id.increase_id()
 	id.put()
 	return value
@@ -225,27 +231,58 @@ def get_user_email():
     result = user.email()
   return result
 
+def get_user_id():
+	result = None
+	user = users.get_current_user()
+	if user:
+		result = user.user_id()
+	return result
+	
 class MainPageHandler(webapp2.RequestHandler):
-  def get(self):
-    email = get_user_email()
-    list = models.sort_by_votes()
-    featured = models.get_featured()
-    page_params = {
-      'user_email': email,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/'),
-	  "list": list,
-	  "featured": featured
-    }
-    render_template(self, 'frontPage.html', page_params)
+	def get(self):
+		email = get_user_email()
+		list = models.sort_by_votes()
+		featured = models.get_featured()
+		page_params = {
+		'user_email': email,
+		'login_url': users.create_login_url(),
+		'logout_url': users.create_logout_url('/'),
+		"list": list,
+		"featured": featured,
+		"user_id": get_user_id(),
+		}
+		render_template(self, 'frontPage.html', page_params)
 
+class ProfileHandler(webapp2.RequestHandler):
+	def get(self):
+		id = self.request.get("id")
+		q = models.get_user_profile(id)
+		if q == []:
+			create_profile(id)
+		profile = ndb.Key(models.user_profile, id).get()
+		page_params = {
+			'user_email': get_user_email(),
+			'login_url': users.create_login_url(),
+			'logout_url': users.create_logout_url('/'),
+			'user_id': get_user_id(),
+		}
+		render_template(self, 'profile.html', page_params)
+
+def create_profile(id):
+	profile = models.user_profile()
+	profile.user_id = id
+	profile.key = ndb.Key(models.user_profile,id)
+	profile.put()
+	logging.warning("profile created!")
+	
 class AddEventPageHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     page_params = {
       'user_email': email,
       'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+      'logout_url': users.create_logout_url('/'),
+	  'user_id': get_user_id(),
     }
     render_template(self, 'addEventPage.html', page_params)
 
@@ -281,6 +318,7 @@ class test(webapp2.RequestHandler):
 		'user_email': email,
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'), 
+		'user_id': get_user_id(),
 		}
 		render_template(self, 'blanktest.html', page_params)
 		
@@ -297,6 +335,7 @@ mappings = [
   ('/profile', ProfilePageHandler),
   ('/calendar', calendar),
   ('/edit', EditHandler),
+  ('/profile', ProfileHandler),
   ('/test', test),
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)

@@ -9,8 +9,12 @@
 <script type="text/javascript" src="https://cdn.datatables.net/r/bs/jq-2.1.4,dt-1.10.9/datatables.min.js"></script>
 
 <script>
+	var url = document.URL; 
+	url = url.split("search=") 
+	url = url[1] /* why doesn't this crash when there is no search? */
 	$(document).ready(function() {
-    $('#example').DataTable();
+    var table = $('#example').DataTable();
+	table.search(url).draw()
 } );
 </script>
 <div class="container table-responsive">
@@ -24,6 +28,7 @@
 					<th>End date</th>
 					<th>End time</th>
 					<th>Location</th>
+					<th hidden>User</th>
 				</tr>
 			</thead>
 			
@@ -36,6 +41,7 @@
 					<th>End date</th>
 					<th>End time</th>
 					<th>Location</th>
+					<th hidden>User</th>
 				</tr>
 			</tfoot>
 			
@@ -50,6 +56,8 @@
 						<th>{{event_info.end_date}}</th>
 						<th>{{event_info.end_time}}</th>
 						<th>{{event_info.location}}</th>
+						<th hidden>{{event_info.user}}</th>
+						
 					</tr>
 			{% endfor %}
 
