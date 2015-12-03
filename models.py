@@ -8,9 +8,10 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 class global_id(ndb.Model):
-	next_id = ndb.StringProperty()
+	next_id = ndb.IntegerProperty()
 	
 	def increase_id(self):
+		logging.warning(self.next_id)
 		self.next_id = self.next_id + 1
 
 class user_profile(ndb.Model):
