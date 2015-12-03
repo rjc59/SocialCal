@@ -124,6 +124,7 @@ class EditHandler(webapp2.RequestHandler):
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'),
 		'event': event,
+		'user_id': get_user_id(),
 		}
 		render_template(self, 'editEventPage.html', page_params)
 		
@@ -182,7 +183,8 @@ class display_event(webapp2.RequestHandler):
 		  'logout_url': users.create_logout_url('/'),
 		  "event": event,
 		  "comments": comments,
-		  "delete": delete
+		  "delete": delete,
+		  'user_id': get_user_id(),
 		}
 
 		render_template(self, 'event.html', page_params)
@@ -195,7 +197,8 @@ class event_list(webapp2.RequestHandler):
       'user_email': email,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
-	  "list": list
+	  "list": list,
+	  'user_id': get_user_id(),
     }
 
 		render_template(self, 'table.html', page_params)
@@ -203,8 +206,11 @@ class event_list(webapp2.RequestHandler):
 ##
 # This gets and increases the global id value. Don't go calling it unless you are adding something
 def get_global_id():
+	
 	id = ndb.Key(models.global_id, "number").get()
+	logging.warning(id)
 	value = id.next_id
+	logging.warning(value)
 	id.increase_id()
 	id.put()
 	return value
@@ -233,20 +239,19 @@ def get_user_id():
 	return result
 	
 class MainPageHandler(webapp2.RequestHandler):
-  def get(self):
-    email = get_user_email()
-    list = models.sort_by_votes()
-    featured = models.get_featured()
-    user_id = get_user_id()
-    page_params = {
-      'user_email': email,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/'),
-	  "list": list,
-	  "featured": featured,
-	  'user_id': user_id,
-    }
-    render_template(self, 'frontPage.html', page_params)
+	def get(self):
+		email = get_user_email()
+		list = models.sort_by_votes()
+		featured = models.get_featured()
+		page_params = {
+		'user_email': email,
+		'login_url': users.create_login_url(),
+		'logout_url': users.create_logout_url('/'),
+		"list": list,
+		"featured": featured,
+		"user_id": get_user_id(),
+		}
+		render_template(self, 'frontPage.html', page_params)
 
 class ProfileHandler(webapp2.RequestHandler):
 	def get(self):
@@ -259,7 +264,7 @@ class ProfileHandler(webapp2.RequestHandler):
 			'user_email': get_user_email(),
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/'),
-			'user_id': id,
+			'user_id': get_user_id(),
 		}
 		render_template(self, 'profile.html', page_params)
 
@@ -276,7 +281,8 @@ class AddEventPageHandler(webapp2.RequestHandler):
     page_params = {
       'user_email': email,
       'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+      'logout_url': users.create_logout_url('/'),
+	  'user_id': get_user_id(),
     }
 
     render_template(self, 'addEventPage.html', page_params)
@@ -303,7 +309,7 @@ class test(webapp2.RequestHandler):
 		'user_email': email,
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'), 
-		'profile_id': users.user_id(),
+		'user_id': get_user_id(),
 		}
 		render_template(self, 'blanktest.html', page_params)
 		
