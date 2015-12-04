@@ -243,13 +243,20 @@ class MainPageHandler(webapp2.RequestHandler):
 		email = get_user_email()
 		list = models.sort_by_votes()
 		featured = models.get_featured()
+		id = get_user_id()
+		location_list = ""
+		q = models.get_user_profile(id)
+		if q != []:
+			location_list = models.get_by_location(q[0].location)
+		
 		page_params = {
 		'user_email': email,
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'),
 		"list": list,
 		"featured": featured,
-		"user_id": get_user_id(),
+		"location_list": location_list,
+		"user_id": id,
 		}
 		render_template(self, 'frontPage.html', page_params)
 

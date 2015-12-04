@@ -93,6 +93,13 @@
 		</div>
 		<div class="col-md-4 text-center">
 			<h3>Events in Your Area</h3>
+			{% for event in location_list %}
+			<h4> <a href = "/event?id={{event.event_number}}" style="text-decoration:none">{{event.title}}</a>
+			{% if event.votes > 0 %} +{{event.votes}}
+			{% else %} 0
+			{% endif %}
+			</h4>
+			{% endfor %}
 		</div>
 		<div class="col-md-4 text-right">
 			<h3>Something Else</h3>

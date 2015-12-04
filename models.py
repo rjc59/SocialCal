@@ -84,6 +84,15 @@ def get_featured():
 	for i in q.fetch(4):
 		result.append(i)
 	return result
+
+def get_by_location(location):
+	result = list()
+	q = event_info.query(event_info.location == location)
+	q = q.order(-event_info.time_created)
+	for i in q.fetch(5):
+		result.append(i)
+	return result
+	
 	
 def get_user_profile(id):
 	logging.warning("start!")
