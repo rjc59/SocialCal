@@ -9,9 +9,9 @@
 				<!--
 					Here is here we need to retrieve the current users profile information and display it, i created a way to edit it.
 				-->
-				<label class="control-label">Name:</label><br>
-				<label class="control-label">Location:<br>
-				<label class="control-label">Interests:<br>
+				<label class="control-label">Name: {{profile.name}}</label><br>
+				<label class="control-label">Location: {{profile.location}}<br>
+				<label class="control-label">Interests: {{profile.interests}}<br>
 				
 			<a class="btn btn-default pull-right" href="#editprofile" data-toggle="modal" text-decoration=none>Edit Profile Information</a>
 			<br>
@@ -23,7 +23,7 @@
 	<div class="modal fade" id="editprofile" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form role = "form" method="post" class="form-horizontal" action="/"> <!--Need to process the information-->
+				<form role = "form" method="post" class="form-horizontal" action="/profile"> <!--Need to process the information-->
 					<div class="modal-header">
 						<he5>Edit Profile Information</he5>
 					</div>

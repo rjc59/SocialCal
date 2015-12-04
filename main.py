@@ -265,8 +265,21 @@ class ProfileHandler(webapp2.RequestHandler):
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/'),
 			'user_id': get_user_id(),
+			'profile': profile,
 		}
 		render_template(self, 'profile.html', page_params)
+	
+	def post(self):
+		id = get_user_id()
+		profile = ndb.Key(models.user_profile, id).get()
+		form_name = self.request.get("name")
+		logging.warning(form_name)
+		form_location = self.request.get("location")
+		form_interests = self.request.get("interests")
+		
+		profile.populate(name = form_name, location = form_location, interests = form_interests)
+		profile.put()
+		self.redirect('/profile?id=' + id)
 
 def create_profile(id):
 	profile = models.user_profile()

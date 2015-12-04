@@ -16,7 +16,9 @@ class global_id(ndb.Model):
 
 class user_profile(ndb.Model):
 	user_id = ndb.StringProperty()
-	
+	name = ndb.StringProperty()
+	location = ndb.StringProperty()
+	interests = ndb.StringProperty()
 	
 class event_info(ndb.Model):
 	title = ndb.StringProperty()
@@ -86,8 +88,11 @@ def get_featured():
 def get_user_profile(id):
 	logging.warning("start!")
 	result = list()
-	q = event_info.query(user_profile.user_id == id)
+	logging.warning(id)
+	q = user_profile.query(user_profile.user_id == id)
+	logging.warning(q)
 	q = q.fetch(1)
+	
 	logging.warning("This is q")
 	logging.warning(q)
 	if q == []:
