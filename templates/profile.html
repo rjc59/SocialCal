@@ -1,40 +1,61 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
-<<<<<<< HEAD
 <body>
 	<br><br><br>
 	{% if user_email %}
-	<div class = "container">
-		<form role = "form" method="post" class="form-horizontal col-md-6" action="/"> <!--Need to process the information-->
-			<div class="form-group text-left"><he5>Profile Information:</he5></div>
-			<div class="row">
-				<div class="form-group">
-					<label for: "summary" class="control-label col-lg-3 text-left">First Name: </label>
-					<div class="col-lg-9">
-						<input type="text" class="form-control" name="first" maxlength=35 required>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="form-group">
-					<label for: "summary" class="control-label col-lg-3 text-left">Last Name: </label>
-					<div class="col-lg-9">
-						<input type="text" class="form-control" name="last" maxlength=35 required>
-					</div>
-				</div>
-			</div>
-			<!--
-			<div class="row">
-				<button type="submit" class="btn btn-default">Submit</button>
-			</div>
-			-->
-		</form>
+	<div class= "container">
+		<div class = "container col-lg-6">
+			<div class="text-left"><he5>Profile Information:</he5></div>
+				<!--
+					Here is here we need to retrieve the current users profile information and display it, i created a way to edit it.
+				-->
+				<label class="control-label">Name:</label><br>
+				<label class="control-label">Location:<br>
+				<label class="control-label">Interests:<br>
+				
+			<a class="btn btn-default pull-right" href="#editprofile" data-toggle="modal" text-decoration=none>Edit Profile Information</a>
+			<br>
+			<div class="text-left"><he5>Posted Events:</he5></div>
+			TODO
+			<a href = "http://localhost:8080/list?search={{user_email}}"> See all of your events </a>
+		</div>
 	</div>
-	<div class = "container">
-		<div class="text-left"><he5>Posted Events:</he5></div>
-		TODO
-		<a href = "http://localhost:8080/list?search={{user_email}}"> See all of your events </a>
+	<div class="modal fade" id="editprofile" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form role = "form" method="post" class="form-horizontal" action="/"> <!--Need to process the information-->
+					<div class="modal-header">
+						<he5>Edit Profile Information</he5>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for: "name" class="col-lg-2 control-label">Name: </label>
+							<div class="col-lg-10">
+								<input type="text" class="form-control" name="name" id="name" value="" maxlength=70 required>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for: "Location" class="col-lg-2 control-label">Location: </label>
+							<div class="col-lg-10">
+								<input type="text" class="form-control" name="location" id="Location" value="" maxlength=35 required>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for: "Interests" class="col-lg-2 control-label">Interests: </label>
+							<div class="col-lg-10">
+								<textarea type="text" class="form-control" name="interests" id="Interests" value="" maxlength=140 required></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<a class="btn btn-default text-right" data-dismiss="modal">Close</a>
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</div>
+				</form>
+			</div>
+		</div>
 	</div>
+	
 	{% else %}
 	<div class = "container">
 		You must be logged in to access this page.
