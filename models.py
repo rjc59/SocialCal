@@ -62,7 +62,46 @@ class event_comment(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
 	time_created = ndb.DateTimeProperty(auto_now_add=True)
+
+def create_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, email):
+
+	event_number = get_global_id()
+	event = event_info()
+	event.populate(title=title,
+		summary=summary,
+		information=information,
+		start_date=start_date,
+		end_date=end_date,
+		start_time=start_time,
+		end_time=end_time,
+		attendance=attendance,
+		location=location,
+		votes=0,
+		user=email,
+		event_number = event_number,)
+		
+	event.key = ndb.Key(event_info, event_number)
+	event.put()
+	return event_number
+
+def edit_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, event_number):
 	
+	event = get_event_info(event_number)
+	event.populate(title=title,
+		summary=summary,
+		information=information,
+		start_date=start_date,
+		end_date=end_date,
+		start_time=start_time,
+		end_time=end_time,
+		attendance=attendance,
+		location=location,)
+		
+	##event.key = ndb.Key(event_info, event_number)
+	event.put()
+		
+	return event_number
+
 def obtain_events():
 	result = list()
 	q = event_info.query()
@@ -115,3 +154,18 @@ def check_if_user_profile_exists(id):
 	if q == []:
 		logging.warning("empty!")
 	return q
+	
+def get_global_id():
+	id = ndb.Key(global_id, "number").get()
+	logging.warning(id)
+	value = id.next_id
+	logging.warning(value)
+	id.increase_id()
+	id.put()
+	return value
+	
+def create_profile(id):
+	profile = user_profile()
+	profile.user_id = id
+	profile.key = ndb.Key(user_profile,id)
+	profile.put()

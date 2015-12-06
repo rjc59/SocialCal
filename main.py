@@ -20,16 +20,11 @@ class VoteHandler(webapp2.RequestHandler):
 
 		event = models.get_event_info(id)
 
-		#email = get_user_email()
-		#text = self.request.get("comment")
-		#event.create_comment(email,text)
 		self.redirect("/event?id=" + id)
 
 class CommentHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		#logging.warning("AYYYYYYYY")
-		#logging.warning(id)
 		event = models.get_event_info(id)
 		email = get_user_email()
 		if not email:
@@ -68,8 +63,7 @@ class DeleteEvent(webapp2.RequestHandler):
 		event = models.get_event_info(id)
 		event.delete_comments()
 		event.key.delete()
-		# time.sleep prevents it from showing on the front page due to redirect happening before the item is deleted
-		# Will look into a better solution
+		
 		time.sleep(0.1)
 		self.redirect('/')
 
@@ -79,88 +73,49 @@ class ProcessForm(webapp2.RequestHandler):
 		if not email:
 			email = "Anonymous"
 
-		form_title = self.request.get("title")
-		form_summary = self.request.get("summary")
-		form_location = self.request.get("location")
-		form_information = self.request.get("information")
-		form_start_date = self.request.get("startdate")
-		form_end_date = self.request.get("enddate")
-		form_start_time = self.request.get("starttime")
-		form_end_time = self.request.get("endtime")
-		#logging.warning("HELLO WORLD")
-		#logging.warning(self.request.get("attendance"))
-		form_attendance = int(self.request.get("attendance"))
-		event_number = get_global_id()
+		title = self.request.get("title")
+		summary = self.request.get("summary")
+		location = self.request.get("location")
+		information = self.request.get("information")
+		start_date = self.request.get("startdate")
+		end_date = self.request.get("enddate")
+		start_time = self.request.get("starttime")
+		end_time = self.request.get("endtime")
+		attendance = int(self.request.get("attendance"))
 		
-		event = models.event_info()
-		event.populate(title=form_title,
-		summary=form_summary,
-		information=form_information,
-		start_date=form_start_date,
-		end_date=form_end_date,
-		start_time=form_start_time,
-		end_time=form_end_time,
-		attendance=form_attendance,
-		location=form_location,
-		votes=0,
-		user=email,
-		event_number = event_number,)
+		event_number = models.create_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, email)
 
-		# This is probably a bad key. Need to figure out a better way to do this. These aspects of the event are uneditable now
-		key_data = event_number
-		#key_data = key_data.urlsafe()
-		event.key = ndb.Key(models.event_info, key_data)
-		event.put()
-		self.redirect("/event?id=" + str(key_data))
+		self.redirect("/event?id=" + str(event_number))
 
 class EditHandler(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
-		logging.warning("Hello")
-		event = models.get_event_info(id)
-		email = get_user_email()
+
 		page_params = {
-		"user_email": email,
+		"user_email": get_user_email(),
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'),
-		'event': event,
+		'event': models.get_event_info(id),
 		'user_id': get_user_id(),
 		}
 		render_template(self, 'editEventPage.html', page_params)
 		
 	def post(self):
-		logging.warning("Hello2")
 		id = self.request.get("id")
 		
-		form_title = self.request.get("title")
-		form_summary = self.request.get("summary")
-		form_location = self.request.get("location")
-		form_information = self.request.get("information")
-		form_start_date = self.request.get("startdate")
-		form_end_date = self.request.get("enddate")
-		form_start_time = self.request.get("starttime")
-		form_end_time = self.request.get("endtime")
-		form_attendance = int(self.request.get("attendance"))
+		title = self.request.get("title")
+		summary = self.request.get("summary")
+		location = self.request.get("location")
+		information = self.request.get("information")
+		start_date = self.request.get("startdate")
+		end_date = self.request.get("enddate")
+		start_time = self.request.get("starttime")
+		end_time = self.request.get("endtime")
+		attendance = int(self.request.get("attendance"))
 
-		event = models.get_event_info(id)
-		
-		event.populate(title=form_title,
-		summary=form_summary,
-		information=form_information,
-		start_date=form_start_date,
-		end_date=form_end_date,
-		start_time=form_start_time,
-		end_time=form_end_time,
-		attendance=form_attendance,
-		location=form_location)
-		
-		
-		
-		event.key = ndb.Key(models.event_info, int(id))
-		event.put()
-		
-		
-		self.redirect('/event?id=' + id)
+		event_number = models.edit_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, id)
+
+		self.redirect("/event?id=" + str(event_number))		
 		
 class display_event(webapp2.RequestHandler):
 	
@@ -168,12 +123,9 @@ class display_event(webapp2.RequestHandler):
 		id = self.request.get("id")
 		delete = 0
 		event = models.get_event_info(id)
-		logging.warning(event)
 		email = get_user_email()
 		comments = event.get_comments()
-		#logging.warning("AYYYYYYY")
-		#logging.warning(event.user)
-		#logging.warning(email)
+
 		if event.user == email:
 			delete = 1
 
@@ -191,29 +143,16 @@ class display_event(webapp2.RequestHandler):
 
 class event_list(webapp2.RequestHandler):
 	def get(self):
-		list = models.obtain_events()
-		email = get_user_email()
+	
 		page_params = {
-      'user_email': email,
+      'user_email': get_user_email(),
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
-	  "list": list,
+	  "list": models.obtain_events(),
 	  'user_id': get_user_id(),
     }
 
 		render_template(self, 'table.html', page_params)
-
-##
-# This gets and increases the global id value. Don't go calling it unless you are adding something
-def get_global_id():
-	
-	id = ndb.Key(models.global_id, "number").get()
-	logging.warning(id)
-	value = id.next_id
-	logging.warning(value)
-	id.increase_id()
-	id.put()
-	return value
 	
 ###############################################################################
 # We'll just use this convenience function to retrieve and render a template.
@@ -240,23 +179,19 @@ def get_user_id():
 	
 class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
-		email = get_user_email()
-		list = models.sort_by_votes()
-		featured = models.get_featured()
 		id = get_user_id()
 		location_list = ""
-		logging.warning(id)
 		
 		q = models.check_if_user_profile_exists(id)
 		if q != []:
 			location_list = models.get_by_location(q[0].location)
 		
 		page_params = {
-		'user_email': email,
+		'user_email': get_user_email(),
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'),
-		"list": list,
-		"featured": featured,
+		"list": models.sort_by_votes(),
+		"featured": models.get_featured(),
 		"location_list": location_list,
 		"user_id": id,
 		}
@@ -267,41 +202,33 @@ class ProfileHandler(webapp2.RequestHandler):
 		id = self.request.get("id")
 		q = models.check_if_user_profile_exists(id)
 		if q == []:
-			create_profile(id)
-		profile = models.get_user_profile(id)
+			models.create_profile(id)
+			
 		page_params = {
 			'user_email': get_user_email(),
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/'),
 			'user_id': get_user_id(),
-			'profile': profile,
+			'profile': models.get_user_profile(id),
 		}
 		render_template(self, 'profile.html', page_params)
 	
 	def post(self):
 		id = get_user_id()
 		profile = models.get_user_profile(id)
-		form_name = self.request.get("name")
-		logging.warning(form_name)
-		form_location = self.request.get("location")
-		form_interests = self.request.get("interests")
+		name = self.request.get("name")
+		location = self.request.get("location")
+		interests = self.request.get("interests")
 		
-		profile.populate(name = form_name, location = form_location, interests = form_interests)
+		profile.populate(name = name, location = location, interests = interests)
 		profile.put()
 		self.redirect('/profile?id=' + id)
-
-def create_profile(id):
-	profile = models.user_profile()
-	profile.user_id = id
-	profile.key = ndb.Key(models.user_profile,id)
-	profile.put()
-	logging.warning("profile created!")
 	
 class AddEventPageHandler(webapp2.RequestHandler):
   def get(self):
-    email = get_user_email()
+  
     page_params = {
-      'user_email': email,
+      'user_email': get_user_email(),
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
 	  'user_id': get_user_id(),
@@ -319,16 +246,13 @@ class calendar(webapp2.RequestHandler):
 	
 class test(webapp2.RequestHandler):
 	def get(self):
-		logging.warning("WORLD")
-		email = get_user_email()
-		logging.warning("hello")
 		id = models.global_id()
 		id.next_id = 1
 		id.key = ndb.Key(models.global_id, "number")
 		id.put()
 		
 		page_params = {
-		'user_email': email,
+		'user_email': get_user_email(),
 		'login_url': users.create_login_url(),
 		'logout_url': users.create_logout_url('/'), 
 		'user_id': get_user_id(),
