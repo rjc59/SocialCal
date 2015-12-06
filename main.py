@@ -263,10 +263,10 @@ class MainPageHandler(webapp2.RequestHandler):
 class ProfileHandler(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
-		q = models.get_user_profile(id)
+		q = models.check_if_user_profile_exists(id)
 		if q == []:
 			create_profile(id)
-		profile = ndb.Key(models.user_profile, id).get()
+		profile = get_user_profile(id)
 		page_params = {
 			'user_email': get_user_email(),
 			'login_url': users.create_login_url(),
@@ -278,7 +278,7 @@ class ProfileHandler(webapp2.RequestHandler):
 	
 	def post(self):
 		id = get_user_id()
-		profile = ndb.Key(models.user_profile, id).get()
+		profile = get_user_profile(id)
 		form_name = self.request.get("name")
 		logging.warning(form_name)
 		form_location = self.request.get("location")

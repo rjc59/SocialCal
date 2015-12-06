@@ -97,8 +97,12 @@ def get_by_location(location):
 def get_event_info(id):
 	result = ndb.Key(event_info, int(id)).get()
 	return result
-	
+
 def get_user_profile(id):
+	result = ndb.Key(user_profile, int(id)).get()
+	return result
+	
+def check_if_user_profile_exists(id):
 	logging.warning("start!")
 	result = list()
 	logging.warning(id)
