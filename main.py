@@ -18,7 +18,7 @@ class VoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
 
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 
 		#email = get_user_email()
 		#text = self.request.get("comment")
@@ -30,7 +30,7 @@ class CommentHandler(webapp2.RequestHandler):
 		id = self.request.get("id")
 		#logging.warning("AYYYYYYYY")
 		#logging.warning(id)
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		email = get_user_email()
 		if not email:
 			email = "Anonymous"
@@ -47,7 +47,7 @@ class UpVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
 		logging.warning(id)
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		event.votes = event.votes + 1
 		event.put()
 		self.redirect("/event?id=" + id)
@@ -56,7 +56,7 @@ class DownVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
 		logging.warning(id)
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		if event.votes != 0:
 			event.votes = event.votes - 1
 			event.put()
@@ -65,7 +65,7 @@ class DownVoteHandler(webapp2.RequestHandler):
 class DeleteEvent(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		event.delete_comments()
 		event.key.delete()
 		# time.sleep prevents it from showing on the front page due to redirect happening before the item is deleted
@@ -117,7 +117,7 @@ class EditHandler(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
 		logging.warning("Hello")
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		email = get_user_email()
 		page_params = {
 		"user_email": email,
@@ -142,7 +142,7 @@ class EditHandler(webapp2.RequestHandler):
 		form_end_time = self.request.get("endtime")
 		form_attendance = int(self.request.get("attendance"))
 
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		
 		event.populate(title=form_title,
 		summary=form_summary,
@@ -167,7 +167,7 @@ class display_event(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
 		delete = 0
-		event = ndb.Key(models.event_info, int(id)).get()
+		event = models.get_event_info(id)
 		logging.warning(event)
 		email = get_user_email()
 		comments = event.get_comments()

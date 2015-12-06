@@ -93,6 +93,10 @@ def get_by_location(location):
 		result.append(i)
 	return result
 	
+
+def get_event_info(id):
+	result = ndb.Key(event_info, int(id)).get()
+	return result
 	
 def get_user_profile(id):
 	logging.warning("start!")
