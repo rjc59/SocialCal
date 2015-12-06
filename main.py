@@ -126,7 +126,7 @@ class display_event(webapp2.RequestHandler):
 		email = get_user_email()
 		comments = event.get_comments()
 
-		if event.user == email:
+		if event.user == email or users.is_current_user_admin():
 			delete = 1
 
 		page_params = {
