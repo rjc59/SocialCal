@@ -245,7 +245,9 @@ class MainPageHandler(webapp2.RequestHandler):
 		featured = models.get_featured()
 		id = get_user_id()
 		location_list = ""
-		q = models.get_user_profile(id)
+		logging.warning(id)
+		
+		q = models.check_if_user_profile_exists(id)
 		if q != []:
 			location_list = models.get_by_location(q[0].location)
 		
@@ -266,7 +268,7 @@ class ProfileHandler(webapp2.RequestHandler):
 		q = models.check_if_user_profile_exists(id)
 		if q == []:
 			create_profile(id)
-		profile = get_user_profile(id)
+		profile = models.get_user_profile(id)
 		page_params = {
 			'user_email': get_user_email(),
 			'login_url': users.create_login_url(),
@@ -278,7 +280,7 @@ class ProfileHandler(webapp2.RequestHandler):
 	
 	def post(self):
 		id = get_user_id()
-		profile = get_user_profile(id)
+		profile = models.get_user_profile(id)
 		form_name = self.request.get("name")
 		logging.warning(form_name)
 		form_location = self.request.get("location")
