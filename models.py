@@ -110,6 +110,21 @@ def edit_event(title, summary, information, start_date, end_date, start_time, en
 	
 	return event_number
 
+def DownVoteEvent(id):
+	event = get_event_info(id)
+	if event.votes != 0:
+		event.votes = event.votes - 1
+		event.put()
+		memcache.set(id, event, namespace='event')
+
+def UpVoteEvent(id):
+	event = get_event_info(id)
+	event.votes = event.votes + 1
+	event.put()
+	memcache.set(id, event, namespace='event')
+	
+	
+	
 def obtain_events():
 	result = memcache.get("events")
 	if not result:

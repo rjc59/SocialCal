@@ -14,13 +14,6 @@ from google.appengine.ext import ndb
 from google.appengine.api import mail
 import models
 
-class VoteHandler(webapp2.RequestHandler):
-	def post(self):
-		id = self.request.get("id")
-
-		event = models.get_event_info(id)
-
-		self.redirect("/event?id=" + id)
 
 class CommentHandler(webapp2.RequestHandler):
 	def post(self):
@@ -41,20 +34,15 @@ class CommentHandler(webapp2.RequestHandler):
 class UpVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		logging.warning(id)
-		event = models.get_event_info(id)
-		event.votes = event.votes + 1
-		event.put()
+		models.UpVoteEvent(id)
+		
 		self.redirect("/event?id=" + id)
 
 class DownVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		logging.warning(id)
-		event = models.get_event_info(id)
-		if event.votes != 0:
-			event.votes = event.votes - 1
-			event.put()
+		models.DownVoteEvent(id)
+		
 		self.redirect("/event?id=" + id)
 
 class DeleteEvent(webapp2.RequestHandler):
