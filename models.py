@@ -200,7 +200,11 @@ def get_event_info(id):
 	return result
 
 def get_user_profile(id):
-	result = ndb.Key(user_profile, id).get()
+	result = memcache.get(id, namespace="profile")
+	if not result:
+		logging.warning("AYYYLAMO")
+		result = ndb.Key(user_profile, id).get()
+		memcache.set(id, result, namespace="profile")
 	return result
 	
 def check_if_user_profile_exists(id):
@@ -219,9 +223,18 @@ def get_global_id():
 	id.increase_id()
 	id.put()
 	return value
+
+def update_profile(id, name, location, interests):
+	profile = get_user_profile(id)
+	profile.populate(name = name, location = location, interests = interests)
+	profile.put()
+	memcache.set(id, profile, namespace="profile")
 	
 def create_profile(id):
 	profile = user_profile()
 	profile.user_id = id
 	profile.key = ndb.Key(user_profile,id)
 	profile.put()
+	
+	memcache.set(id, profile, namespace="profile")
+	

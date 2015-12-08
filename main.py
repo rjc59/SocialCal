@@ -209,15 +209,13 @@ class ProfileHandler(webapp2.RequestHandler):
 	
 	def post(self):
 		id = get_user_id()
-		profile = models.get_user_profile(id)
 		name = self.request.get("name")
 		location = self.request.get("location")
 		interests = self.request.get("interests")
 		
-		profile.populate(name = name, location = location, interests = interests)
-		profile.put()
-		email = get_user_email()
-		self.redirect('/profile?id=' + id + "&search=" + email)
+		models.update_profile(id, name, location, interests)
+
+		self.redirect('/profile?id=' + id + "&search=" + get_user_email())
 	
 class AddEventPageHandler(webapp2.RequestHandler):
   def get(self):
