@@ -245,10 +245,7 @@ class about(webapp2.RequestHandler):
 
 class test(webapp2.RequestHandler):
 	def get(self):
-		id = models.global_id()
-		id.next_id = 1
-		id.key = ndb.Key(models.global_id, "number")
-		id.put()
+		models.create_global_id()
 		
 		page_params = {
 		'user_email': get_user_email(),

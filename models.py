@@ -13,7 +13,6 @@ class global_id(ndb.Model):
 	next_id = ndb.IntegerProperty()
 	
 	def increase_id(self):
-		#logging.warning(self.next_id)
 		self.next_id = self.next_id + 1
 
 class user_profile(ndb.Model):
@@ -192,17 +191,13 @@ def delete_event(id):
 def get_event_info(id):
 	result = memcache.get(id, namespace="event")
 	if not result:
-		#logging.warning("AYYYYYYLMAO")
 		result = ndb.Key(event_info, int(id)).get()
-	#	logging.warning(result)
 		memcache.set(id, result, namespace='event')
-	#logging.warning(result)
 	return result
 
 def get_user_profile(id):
 	result = memcache.get(id, namespace="profile")
 	if not result:
-		logging.warning("AYYYLAMO")
 		result = ndb.Key(user_profile, id).get()
 		memcache.set(id, result, namespace="profile")
 	return result
@@ -216,12 +211,14 @@ def check_if_user_profile_exists(id):
 	return q
 	
 def get_global_id():
-	id = ndb.Key(global_id, "number").get()
-	
+	id = memcache.get("number", namespace="global_id")
+	if not id:
+		id = ndb.Key(global_id, "number").get()
+		
 	value = id.next_id
-	
 	id.increase_id()
 	id.put()
+	memcache.set("number", id, namespace="global_id")
 	return value
 
 def update_profile(id, name, location, interests):
@@ -238,3 +235,9 @@ def create_profile(id):
 	
 	memcache.set(id, profile, namespace="profile")
 	
+def create_global_id():
+	id = global_id()
+	id.next_id = 1
+	id.key = ndb.Key(models.global_id, "number")
+	id.put()
+	memcache.set("number", id, namespace="global_id")
