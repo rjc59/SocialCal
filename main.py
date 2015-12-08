@@ -48,11 +48,12 @@ class DownVoteHandler(webapp2.RequestHandler):
 class DeleteEvent(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		event = models.get_event_info(id)
-		event.delete_comments()
-		event.key.delete()
+		models.delete_event(id)
+	#	event = models.get_event_info(id)
+	#	event.delete_comments()
+	#	event.key.delete()
 		
-		time.sleep(0.1)
+	#	time.sleep(0.1)
 		self.redirect('/')
 
 class ProcessForm(webapp2.RequestHandler):

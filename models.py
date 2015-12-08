@@ -85,7 +85,7 @@ def create_event(title, summary, information, start_date, end_date, start_time, 
 	event.put()
 	
 	memcache.delete('events')
-	memcache.set(str(event.number), event, namespace='event')
+	memcache.set(str(event.event_number), event, namespace='event')
 	
 	return event_number
 
@@ -106,7 +106,7 @@ def edit_event(title, summary, information, start_date, end_date, start_time, en
 	event.put()
 	
 	memcache.delete('events')
-	memcache.set(str(event.key), event_info, namespace='event')	
+	memcache.set(str(event.event_number), event, namespace='event')	
 	
 	return event_number
 
@@ -158,7 +158,13 @@ def get_by_location(location):
 		result.append(i)
 	return result
 	
-
+def delete_event(id):
+	event = get_event_info(id)
+	event.delete_comments()
+	memcache.delete(id, namespace="event")
+	event.key.delete()
+	
+		
 def get_event_info(id):
 	result = memcache.get(id, namespace="event")
 	if not result:
