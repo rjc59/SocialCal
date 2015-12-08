@@ -47,7 +47,17 @@
 					<input type="submit" class="btn btn-default" value="Delete this event">
 				</form>
 			</td>
-			
+			<!--Permissions for admin only, if featured already, display unfeatured button-->
+			<td>
+				<form method="post" class="horizontal-form" action="/FeatureEvent">
+					<input type="submit" class="btn btn-default" value="Make Featured">
+				</form>
+			</td>
+			<td>
+				<form method="post" class="horizontal-form" action="/FeatureEvent">
+					<input type="submit" class="btn btn-default" value="Unfeature">
+				</form>
+			</td>
 			{% endif %}
 		</tr>	
 	</table>

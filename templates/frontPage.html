@@ -81,7 +81,7 @@
 -->
 <div class="container">
 	<div class="row">
-		<div class="col-md-4 text-left">
+		<div class="col-md-4 text-center">
 			<h3>Most Popular Events</h3>
 			{% for event in list %}
 			<h4> <a href = "/event?id={{event.event_number}}" style="text-decoration:none">{{event.title}}</a>
@@ -92,7 +92,7 @@
 			{% endfor %}
 		</div>
 		<div class="col-md-4 text-center">
-			<h3>Events in Your Area</h3>
+			<h3>Recently Added/Events Near You</h3>
 			{% for event in location_list %}
 			<h4> <a href = "/event?id={{event.event_number}}" style="text-decoration:none">{{event.title}}</a>
 			{% if event.votes > 0 %} +{{event.votes}}
@@ -101,8 +101,8 @@
 			</h4>
 			{% endfor %}
 		</div>
-		<div class="col-md-4 text-right">
-			<h3>Upcomming Events</h3>
+		<div class="col-md-4 text-center">
+			<h3>Featured Events</h3>
 		</div>
 	</div>
 </div>

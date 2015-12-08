@@ -240,6 +240,9 @@ class about(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     page_params = {
+	  'user_email': email,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'about.html', page_params)	
 

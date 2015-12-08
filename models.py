@@ -238,6 +238,6 @@ def create_profile(id):
 def create_global_id():
 	id = global_id()
 	id.next_id = 1
-	id.key = ndb.Key(models.global_id, "number")
+	id.key = ndb.Key(global_id, "number")
 	id.put()
 	memcache.set("number", id, namespace="global_id")
