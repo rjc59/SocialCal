@@ -6,12 +6,14 @@ import webapp2
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.api import memcache
+
 
 class global_id(ndb.Model):
 	next_id = ndb.IntegerProperty()
 	
 	def increase_id(self):
-		logging.warning(self.next_id)
+		#logging.warning(self.next_id)
 		self.next_id = self.next_id + 1
 
 class user_profile(ndb.Model):
@@ -44,7 +46,6 @@ class event_info(ndb.Model):
 		return comment
 		
 	def get_comments(self):
-		#logging.warning("test")
 		result = list()
 		q = event_comment.query(ancestor=self.key)
 		q = q.order(-event_comment.time_created)
@@ -82,6 +83,10 @@ def create_event(title, summary, information, start_date, end_date, start_time, 
 		
 	event.key = ndb.Key(event_info, event_number)
 	event.put()
+	
+	memcache.delete('events')
+	memcache.set(str(event.number), event, namespace='event')
+	
 	return event_number
 
 def edit_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, event_number):
@@ -99,14 +104,20 @@ def edit_event(title, summary, information, start_date, end_date, start_time, en
 		
 	##event.key = ndb.Key(event_info, event_number)
 	event.put()
-		
+	
+	memcache.delete('events')
+	memcache.set(str(event.key), event_info, namespace='event')	
+	
 	return event_number
 
 def obtain_events():
-	result = list()
-	q = event_info.query()
-	for event in q.fetch(100):
-		result.append(event)
+	result = memcache.get("events")
+	if not result:
+		result = list()
+		q = event_info.query()
+		for event in q.fetch(100):
+			result.append(event)
+		memcache.set('events', result)
 	return result
 	
 def sort_by_votes():
@@ -134,7 +145,13 @@ def get_by_location(location):
 	
 
 def get_event_info(id):
-	result = ndb.Key(event_info, int(id)).get()
+	result = memcache.get(id, namespace="event")
+	if not result:
+		#logging.warning("AYYYYYYLMAO")
+		result = ndb.Key(event_info, int(id)).get()
+	#	logging.warning(result)
+		memcache.set(id, result, namespace='event')
+	#logging.warning(result)
 	return result
 
 def get_user_profile(id):
@@ -142,24 +159,18 @@ def get_user_profile(id):
 	return result
 	
 def check_if_user_profile_exists(id):
-	logging.warning("start!")
 	result = list()
-	logging.warning(id)
 	q = user_profile.query(user_profile.user_id == id)
-	logging.warning(q)
 	q = q.fetch(1)
 	
-	logging.warning("This is q")
-	logging.warning(q)
-	if q == []:
-		logging.warning("empty!")
+	##if q == []:
 	return q
 	
 def get_global_id():
 	id = ndb.Key(global_id, "number").get()
-	logging.warning(id)
+	
 	value = id.next_id
-	logging.warning(value)
+	
 	id.increase_id()
 	id.put()
 	return value

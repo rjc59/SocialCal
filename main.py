@@ -124,6 +124,7 @@ class display_event(webapp2.RequestHandler):
 		delete = 0
 		event = models.get_event_info(id)
 		email = get_user_email()
+		logging.warning(event)
 		comments = event.get_comments()
 
 		if event.user == email or users.is_current_user_admin():
