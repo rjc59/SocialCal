@@ -34,14 +34,16 @@ class CommentHandler(webapp2.RequestHandler):
 class UpVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		models.UpVoteEvent(id)
+		email = get_user_email()
+		models.UpVoteEvent(id, email)
 		
 		self.redirect("/event?id=" + id)
 
 class DownVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
-		models.DownVoteEvent(id)
+		email = get_user_email()
+		models.DownVoteEvent(id, email)
 		
 		self.redirect("/event?id=" + id)
 
@@ -113,7 +115,7 @@ class display_event(webapp2.RequestHandler):
 		delete = 0
 		event = models.get_event_info(id)
 		email = get_user_email()
-		logging.warning(event)
+		#logging.warning(event)
 		comments = event.get_comments()
 
 		if event.user == email or users.is_current_user_admin():

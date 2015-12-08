@@ -36,7 +36,8 @@ class event_info(ndb.Model):
 	votes = ndb.IntegerProperty()
 	event_number = ndb.IntegerProperty()
 	user = ndb.StringProperty()
-	
+	has_up_voted = ndb.StringProperty(repeated=True)
+	has_down_voted = ndb.StringProperty(repeated=True)
 	featured = ndb.BooleanProperty()
 
 	def create_comment(self, xuser, xtext):
@@ -110,20 +111,43 @@ def edit_event(title, summary, information, start_date, end_date, start_time, en
 	
 	return event_number
 
-def DownVoteEvent(id):
+def DownVoteEvent(id, email):
 	event = get_event_info(id)
-	if event.votes != 0:
-		event.votes = event.votes - 1
+	
+	if not check_if_down_voted(event.has_down_voted, email):
+		event.has_down_voted.append(email)
+		if check_if_up_voted(event.has_up_voted, email):
+			event.has_up_voted.remove(email)
+			
+		event.votes = len(event.has_up_voted) - len(event.has_down_voted)	
+		if event.votes < 0:
+			event.votes = 0
 		event.put()
 		memcache.set(id, event, namespace='event')
-
-def UpVoteEvent(id):
+		
+def UpVoteEvent(id, email):
 	event = get_event_info(id)
-	event.votes = event.votes + 1
-	event.put()
-	memcache.set(id, event, namespace='event')
 	
+	if not check_if_up_voted(event.has_up_voted, email):
+		event.has_up_voted.append(email)
+		if check_if_down_voted(event.has_down_voted, email):
+			event.has_down_voted.remove(email)
+			
+		event.votes = len(event.has_up_voted) - len(event.has_down_voted)	
+		if event.votes < 0:
+			event.votes = 0
+		event.put()
+		memcache.set(id, event, namespace='event')
 	
+def check_if_up_voted(has_up_voted,email):
+	if email in has_up_voted:
+		return True
+	return False
+
+def check_if_down_voted(has_down_voted, email):
+	if email in has_down_voted:
+		return True
+	return False
 	
 def obtain_events():
 	result = memcache.get("events")
