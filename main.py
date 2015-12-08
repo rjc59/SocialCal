@@ -200,6 +200,7 @@ class ProfileHandler(webapp2.RequestHandler):
 			'user_email': get_user_email(),
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/'),
+			"list": models.obtain_events(),
 			'user_id': get_user_id(),
 			'profile': models.get_user_profile(id),
 		}
@@ -235,7 +236,13 @@ class calendar(webapp2.RequestHandler):
     }
     render_template(self, 'calendar.html', page_params)
 
-	
+class about(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    page_params = {
+    }
+    render_template(self, 'about.html', page_params)	
+
 class test(webapp2.RequestHandler):
 	def get(self):
 		id = models.global_id()
@@ -265,5 +272,7 @@ mappings = [
   ('/edit', EditHandler),
   ('/profile', ProfileHandler),
   ('/test', test),
+  ('/about', about),
+  
 ]
 app = webapp2.WSGIApplication(mappings, debug = True)

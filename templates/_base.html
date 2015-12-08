@@ -29,7 +29,7 @@
 					</li>
 					<li>
 						{% if user_email %}
-						<a href="/profile?id={{user_id}}">Profile</a>
+						<a href="/profile?id={{user_id}}&list?search={{user_email}}">Profile</a>
 						{% else %}
 						{% endif %}
 					</li>
@@ -40,7 +40,7 @@
 						<a href="{{ login_url }}">Sign In</a>
 						{% endif %}
 					</li>
-					<li><a href = "/">About Us</a></li>
+					<li><a href = "/about">About Us</a></li>
 				</ul>
 			</div>
 		</div>
