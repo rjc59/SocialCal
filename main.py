@@ -192,6 +192,7 @@ class MainPageHandler(webapp2.RequestHandler):
 class ProfileHandler(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
+		logging.warning(id)
 		q = models.check_if_user_profile_exists(id)
 		if q == []:
 			models.create_profile(id)
@@ -215,7 +216,8 @@ class ProfileHandler(webapp2.RequestHandler):
 		
 		profile.populate(name = name, location = location, interests = interests)
 		profile.put()
-		self.redirect('/profile?id=' + id)
+		email = get_user_email()
+		self.redirect('/profile?id=' + id + "&search=" + email)
 	
 class AddEventPageHandler(webapp2.RequestHandler):
   def get(self):
