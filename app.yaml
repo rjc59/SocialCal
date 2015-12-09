@@ -1,4 +1,5 @@
 application: socialcalender1520
+
 version: v1
 runtime: python27
 api_version: 1
@@ -11,6 +12,6 @@ handlers:
 - url: /tasks/.*
   script: crontasks.app
   login: admin
-  
+
 - url: /.*
   script: main.app

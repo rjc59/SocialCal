@@ -1,3 +1,5 @@
+# For testing purposes (making sure api functions correctly), not used on site
+
 from __future__ import print_function
 import httplib2
 import os
@@ -15,7 +17,7 @@ try:
 except ImportError:
     flags = None
 
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+SCOPES = 'https://www.googleapis.com/auth/calendar'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
@@ -43,20 +45,12 @@ def get_credentials():
         flow.user_agent = APPLICATION_NAME
         if flags:
             credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatability with Python 2.6
+        else: # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
 
 def main():
-    """Shows basic usage of the Google Calendar API.
-
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
-
-    Just for testing purposes- this is where event data will be gathered and
-    stored into user calendars in the future
-    """
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
@@ -73,6 +67,25 @@ def main():
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
         print(start, event['summary'])
+
+    event = {
+      'summary': 'test event',
+      'location': 'home',
+      'description': 'test test',
+      'start': {
+        'dateTime': '2015-12-10T09:00:00-07:00',
+        'timeZone': 'America/New_York',
+      },
+      'end': {
+        'dateTime': '2015-12-10T09:00:00-07:00',
+        'timeZone': 'America/New_York',
+      },
+      'attendees[].email': 'mrbobbyc@gmail.com',
+      'reminders.overrides[].method': 'popup',
+      'reminders.overrides[].minutes': '1440',
+    }
+
+    event = service.events().insert(calendarId='primary', body=event).execute()
 
 
 if __name__ == '__main__':

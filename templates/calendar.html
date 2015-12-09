@@ -11,9 +11,9 @@
 var clientId = '104939376594-10snnbepba4jsk06ad9bj3lvnq36njlk.apps.googleusercontent.com'; //choose web app client Id, redirect URI and Javascript origin set to http://localhost
 var apiKey = 'AIzaSyAwvzH_wELdBDGXQzRkzC23o64s47R-ViU'; //choose public apiKey, any IP allowed (leave blank the allowed IP boxes in Google Dev Console)
 var userEmail = "mrbobbyc@gmail.com"; //your calendar Id
-var userTimeZone = "Los_Angeles"; //example "Rome" "Los_Angeles" ecc...
-var maxRows = 10; //events to shown
-var calName = "YOUR EVENTS"; //name of calendar (write what you want, doesn't matter)
+var userTimeZone = "New_York";
+var maxRows = 10;
+var calName = "YOUR EVENTS";
 
 var scopes = 'https://www.googleapis.com/auth/calendar';
 
@@ -121,7 +121,7 @@ function makeApiCall() {
                     var time = dateTime[1].split(":"); //split hh ss etc...
                     var startHour = AmPm(time[0]);
                     var startMin = time[1];
-                    var str = [ //change this to match your needs
+                    var str = [
                         '<font size="4" face="courier">',
                         startDayWeek, ' ',
                         startMonth, ' ',
