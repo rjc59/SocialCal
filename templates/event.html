@@ -80,6 +80,7 @@
 		</div>
 	</div>
 </div>
+{% if user_email %}
 <div class ="container">
 <nc>Add New Comment:</nc>
 	<form method="post" action="/CommentHandler">
@@ -89,7 +90,7 @@
 	</form>
 	<br>
 </div>
-	
+{% endif %}
 
 </body>
 

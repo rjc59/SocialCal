@@ -28,7 +28,7 @@ class CommentHandler(webapp2.RequestHandler):
 		self.redirect("/event?id=" + id)
 
 		if event.user != "Anonymous":
-			mail.send_mail(sender="socialeventcal@socialeventcal.appspotmail.com", to=event.user, subject="Someone commented on your post!", body="Someone commented on your post! Click here to see it: gdh12-socal-test.appspot.com/event?id=" + id)
+			mail.send_mail(sender="socialcalender1520@appspot.gserviceaccount.com", to=event.user, subject="Someone commented on your post!", body="Someone commented on your post! Click here to see it: socialcalender1520.appspot.com/event?id=" + id)
 
 class FeatureEvent(webapp2.RequestHandler):
 	def post(self):
