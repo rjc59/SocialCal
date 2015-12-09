@@ -12,8 +12,6 @@ from google.appengine.api import memcache
 class global_id(ndb.Model):
 	next_id = ndb.IntegerProperty()
 	
-	def increase_id(self):
-		self.next_id = self.next_id + 1
 
 class user_profile(ndb.Model):
 	user_id = ndb.StringProperty()
@@ -249,10 +247,13 @@ def create_profile(id):
 	profile.put()
 	
 	memcache.set(id, profile, namespace="profile")
-	
+
 def create_global_id():
-	id = global_id()
-	id.next_id = 1
-	id.key = ndb.Key(global_id, "number")
-	id.put()
-	memcache.set("number", id, namespace="global_id")
+	id = ndb.Key(global_id, "number").get()
+	#logging.warning(id)
+	if id == None:
+		id = global_id()
+		id.next_id = 1
+		id.key = ndb.Key(global_id, "number")
+		id.put()
+		memcache.set("number", id, namespace="global_id")
