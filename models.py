@@ -64,6 +64,12 @@ class event_comment(ndb.Model):
 	text = ndb.TextProperty()
 	time_created = ndb.DateTimeProperty(auto_now_add=True)
 
+def setFeatured(id):
+	event = get_event_info(id)
+	event.featured = not event.featured
+	event.put()
+	memcache.set(str(event.event_number), event, namespace='event')
+	
 def create_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, email):
 
 	event_number = get_global_id()
@@ -77,6 +83,7 @@ def create_event(title, summary, information, start_date, end_date, start_time, 
 		end_time=end_time,
 		attendance=attendance,
 		location=location,
+		featured=False,
 		votes=0,
 		user=email,
 		event_number = event_number,)
@@ -169,10 +176,18 @@ def sort_by_votes():
 def get_featured():
 	result = list()
 	q = event_info.query(event_info.featured == True)
-	for i in q.fetch(4):
+	for i in q.fetch(5):
 		result.append(i)
 	return result
 
+def get_recent_events():
+	result = list()
+	q = event_info.query()
+	q = q.order(-event_info.time_created)
+	for i in q.fetch(5):
+		result.append(i)
+	return result
+	
 def get_by_location(location):
 	result = list()
 	q = event_info.query(event_info.location == location)
