@@ -8,8 +8,4 @@ the material
 -Fill out rest of front page with stuff
 -Add more to about page
 
--Feature Button, Recently Added on Front Page
--Fix test page
--CRON
--ADMIN
 -DELETE OLD DATABASE OR NEW URL
