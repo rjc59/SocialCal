@@ -12,6 +12,8 @@ from google.appengine.api import memcache
 class global_id(ndb.Model):
 	next_id = ndb.IntegerProperty()
 	
+	def increase_id(self):
+		self.next_id = self.next_id + 1
 
 class user_profile(ndb.Model):
 	user_id = ndb.StringProperty()
@@ -164,26 +166,35 @@ def obtain_events():
 	return result
 	
 def sort_by_votes():
-	result = list()
-	q = event_info.query()
-	q = q.order(-event_info.votes)
-	for i in q.fetch(5):
-		result.append(i)
+	result = memcache.get("sort_by_votes")
+	if not result:
+		result = list()
+		q = event_info.query()
+		q = q.order(-event_info.votes)
+		for i in q.fetch(5):
+			result.append(i)
+		memcache.set("sort_by_votes", result)
 	return result
 
 def get_featured():
-	result = list()
-	q = event_info.query(event_info.featured == True)
-	for i in q.fetch(5):
-		result.append(i)
+	result = memcache.get("featured")
+	if not result:
+		result = list()
+		q = event_info.query(event_info.featured == True)
+		for i in q.fetch(5):
+			result.append(i)
+		memcache.set("featured", result)
 	return result
 
 def get_recent_events():
-	result = list()
-	q = event_info.query()
-	q = q.order(-event_info.time_created)
-	for i in q.fetch(5):
-		result.append(i)
+	result = memcache.get("recent_events")
+	if not result:
+		result = list()
+		q = event_info.query()
+		q = q.order(-event_info.time_created)
+		for i in q.fetch(5):
+			result.append(i)
+		memcache.set("recent_events", result)
 	return result
 	
 def get_by_location(location):
@@ -227,7 +238,7 @@ def get_global_id():
 	id = memcache.get("number", namespace="global_id")
 	if not id:
 		id = ndb.Key(global_id, "number").get()
-		
+	logging.warning(id)	
 	value = id.next_id
 	id.increase_id()
 	id.put()
