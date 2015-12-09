@@ -47,15 +47,13 @@
 					<input type="submit" class="btn btn-default" value="Delete this event">
 				</form>
 			</td>
+			{% endif %}
 			<!--Permissions for admin only, if featured already, display unfeatured button-->
+			{% if is_admin == 1 %}
 			<td>
 				<form method="post" class="horizontal-form" action="/FeatureEvent">
-					<input type="submit" class="btn btn-default" value="Make Featured">
-				</form>
-			</td>
-			<td>
-				<form method="post" class="horizontal-form" action="/FeatureEvent">
-					<input type="submit" class="btn btn-default" value="Unfeature">
+					<input type="hidden" name="id" value="{{event.event_number}}">
+					<input type="submit" class="btn btn-default" value="Toggle Featured: {{event.featured}}">
 				</form>
 			</td>
 			{% endif %}

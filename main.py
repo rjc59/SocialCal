@@ -30,7 +30,13 @@ class CommentHandler(webapp2.RequestHandler):
 		if event.user != "Anonymous":
 			mail.send_mail(sender="socialeventcal@socialeventcal.appspotmail.com", to=event.user, subject="Someone commented on your post!", body="Someone commented on your post! Click here to see it: gdh12-socal-test.appspot.com/event?id=" + id)
 
-
+class FeatureEvent(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
+		models.setFeatured(id)
+		
+		self.redirect("/event?id=" + id)
+		
 class UpVoteHandler(webapp2.RequestHandler):
 	def post(self):
 		id = self.request.get("id")
@@ -113,13 +119,18 @@ class display_event(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
 		delete = 0
+		is_admin = 0
 		event = models.get_event_info(id)
 		email = get_user_email()
 		#logging.warning(event)
 		comments = event.get_comments()
 
-		if event.user == email or users.is_current_user_admin():
+		if event.user == email:
 			delete = 1
+		
+		if users.is_current_user_admin():
+			delete = 1
+			is_admin = 1
 
 		page_params = {
 		  'user_email': email,
@@ -128,6 +139,7 @@ class display_event(webapp2.RequestHandler):
 		  "event": event,
 		  "comments": comments,
 		  "delete": delete,
+		  "is_admin": is_admin,
 		  'user_id': get_user_id(),
 		}
 
@@ -172,11 +184,11 @@ def get_user_id():
 class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		id = get_user_id()
-		location_list = ""
+	#	location_list = ""
 		
 		q = models.check_if_user_profile_exists(id)
-		if q != []:
-			location_list = models.get_by_location(q[0].location)
+		#if q != []:
+		#	location_list = models.get_by_location(q[0].location)
 		
 		page_params = {
 		'user_email': get_user_email(),
@@ -184,7 +196,8 @@ class MainPageHandler(webapp2.RequestHandler):
 		'logout_url': users.create_logout_url('/'),
 		"list": models.sort_by_votes(),
 		"featured": models.get_featured(),
-		"location_list": location_list,
+		#"location_list": location_list,
+		"recent_events": models.get_recent_events(),
 		"user_id": id,
 		}
 		render_template(self, 'frontPage.html', page_params)
@@ -249,7 +262,6 @@ class about(webapp2.RequestHandler):
 class test(webapp2.RequestHandler):
 	def get(self):
 		models.create_global_id()
-		
 		page_params = {
 		'user_email': get_user_email(),
 		'login_url': users.create_login_url(),
@@ -271,6 +283,7 @@ mappings = [
   ('/calendar', calendar),
   ('/edit', EditHandler),
   ('/profile', ProfileHandler),
+  ('/FeatureEvent', FeatureEvent),
   ('/test', test),
   ('/about', about),
   

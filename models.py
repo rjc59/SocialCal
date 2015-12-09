@@ -64,6 +64,12 @@ class event_comment(ndb.Model):
 	text = ndb.TextProperty()
 	time_created = ndb.DateTimeProperty(auto_now_add=True)
 
+def setFeatured(id):
+	event = get_event_info(id)
+	event.featured = not event.featured
+	event.put()
+	memcache.set(str(event.event_number), event, namespace='event')
+	
 def create_event(title, summary, information, start_date, end_date, start_time, end_time, attendance, location, email):
 
 	event_number = get_global_id()
@@ -77,6 +83,7 @@ def create_event(title, summary, information, start_date, end_date, start_time, 
 		end_time=end_time,
 		attendance=attendance,
 		location=location,
+		featured=False,
 		votes=0,
 		user=email,
 		event_number = event_number,)
@@ -159,20 +166,37 @@ def obtain_events():
 	return result
 	
 def sort_by_votes():
-	result = list()
-	q = event_info.query()
-	q = q.order(-event_info.votes)
-	for i in q.fetch(5):
-		result.append(i)
+	result = memcache.get("sort_by_votes")
+	if not result:
+		result = list()
+		q = event_info.query()
+		q = q.order(-event_info.votes)
+		for i in q.fetch(5):
+			result.append(i)
+		memcache.set("sort_by_votes", result)
 	return result
 
 def get_featured():
-	result = list()
-	q = event_info.query(event_info.featured == True)
-	for i in q.fetch(4):
-		result.append(i)
+	result = memcache.get("featured")
+	if not result:
+		result = list()
+		q = event_info.query(event_info.featured == True)
+		for i in q.fetch(5):
+			result.append(i)
+		memcache.set("featured", result)
 	return result
 
+def get_recent_events():
+	result = memcache.get("recent_events")
+	if not result:
+		result = list()
+		q = event_info.query()
+		q = q.order(-event_info.time_created)
+		for i in q.fetch(5):
+			result.append(i)
+		memcache.set("recent_events", result)
+	return result
+	
 def get_by_location(location):
 	result = list()
 	q = event_info.query(event_info.location == location)
@@ -214,7 +238,7 @@ def get_global_id():
 	id = memcache.get("number", namespace="global_id")
 	if not id:
 		id = ndb.Key(global_id, "number").get()
-		
+	logging.warning(id)	
 	value = id.next_id
 	id.increase_id()
 	id.put()
@@ -234,10 +258,13 @@ def create_profile(id):
 	profile.put()
 	
 	memcache.set(id, profile, namespace="profile")
-	
+
 def create_global_id():
-	id = global_id()
-	id.next_id = 1
-	id.key = ndb.Key(global_id, "number")
-	id.put()
-	memcache.set("number", id, namespace="global_id")
+	id = ndb.Key(global_id, "number").get()
+	#logging.warning(id)
+	if id == None:
+		id = global_id()
+		id.next_id = 1
+		id.key = ndb.Key(global_id, "number")
+		id.put()
+		memcache.set("number", id, namespace="global_id")
