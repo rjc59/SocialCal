@@ -256,6 +256,7 @@ class about(webapp2.RequestHandler):
 	  'user_email': email,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
+	  'user_id': get_user_id(),
     }
     render_template(self, 'about.html', page_params)	
 
